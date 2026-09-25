@@ -2,6 +2,7 @@ from src.main import (
     show_menu,
     exercise_menu,
     workout_menu,
+    workout_history,
     weekly_performance,
     main,
     is_valid_menu_choice,
@@ -38,7 +39,7 @@ def test_weekly_performance():
     weekly_performance()
 
 def test_invalid_main_menu_choice(monkeypatch, capsys):
-    inputs = iter(["99", "4"])
+    inputs = iter(["99", "5"])
 
     monkeypatch.setattr("builtins.input", lambda _: next(inputs))
 
@@ -46,7 +47,7 @@ def test_invalid_main_menu_choice(monkeypatch, capsys):
 
     captured = capsys.readouterr()
 
-    assert "Invalid choice. Please select 1-4." in captured.out
+    assert "Invalid choice. Please select 1-5." in captured.out
     assert "Goodbye!" in captured.out
 
 
@@ -55,8 +56,9 @@ def test_is_valid_menu_choice():
     assert is_valid_menu_choice("2") is True
     assert is_valid_menu_choice("3") is True
     assert is_valid_menu_choice("4") is True
+    assert is_valid_menu_choice("5") is True
 
-    assert is_valid_menu_choice("5") is False
+    assert is_valid_menu_choice("6") is False
     assert is_valid_menu_choice("99") is False
     assert is_valid_menu_choice("abc") is False
 
@@ -93,3 +95,7 @@ def test_is_valid_date():
     assert is_valid_date("2026-13-50") is False
     assert is_valid_date("abc") is False
     assert is_valid_date("22-09-2026") is False
+
+
+def test_workout_history(monkeypatch):
+    workout_history()

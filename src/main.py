@@ -1,6 +1,6 @@
 from datetime import datetime
-
-
+from src.database import create_database, log_workout, get_workout_history
+from src.api import suggest_exercises
 
 
 def is_valid_date(date):
@@ -14,7 +14,7 @@ def is_valid_date(date):
     
 def is_valid_menu_choice(choice):
     """Check whether the main menu choice is valid."""
-    return choice in ["1", "2", "3", "4"]
+    return choice in ["1", "2", "3", "4","5"]
 
 def is_valid_exercise_choice(choice):
     """Check whether the exercise menu choice is valid."""
@@ -27,8 +27,9 @@ def show_menu():
     print("================================")
     print("1. Exercise Suggestion")
     print("2. Workout Logger")
-    print("3. Weekly Performance")
-    print("4. Exit")
+    print("3. Workout History")
+    print("4. Weekly Performance")
+    print("5. Exit")
     print("================================")
 
 
@@ -51,29 +52,39 @@ def exercise_menu():
             print("\nInvalid choice. Please select 1-7.")
             continue
 
-        if choice == "1":
-            print("\nYou selected Chest")
-
-        elif choice == "2":
-            print("\nYou selected Back")
-
-        elif choice == "3":
-            print("\nYou selected Legs")
-
-        elif choice == "4":
-            print("\nYou selected Shoulders")
-
-        elif choice == "5":
-            print("\nYou selected Arms")
-
-        elif choice == "6":
-            print("\nYou selected Abs")
-
-        elif choice == "7":
+        if choice == "7":
             break
 
-        else:
-            print("\nInvalid choice. Please select 1-7.")
+        muscle_groups = {
+            "1": "chest",
+            "2": "back",
+            "3": "legs",
+            "4": "shoulders",
+            "5": "arms",
+            "6": "abs"
+        }
+
+        muscle = muscle_groups[choice]
+
+        print(f"\nYou selected {muscle.title()}")
+        print("Loading exercises...")
+
+        exercises = suggest_exercises(muscle)
+
+        if not exercises:
+            print("No exercises found.")
+            continue
+
+        print("\nRecommended Exercises:")
+
+        for exercise in exercises[:10]:
+            name = exercise.get("name", "Unknown")
+            equipment = exercise.get("equipments", [])
+
+            print(f"\n- {name}")
+
+            if equipment:
+                print(f"  Equipment: {', '.join(equipment)}")
 
 
 def workout_menu():
@@ -82,6 +93,7 @@ def workout_menu():
     print("==============================")
 
     exercise = input("Enter exercise name: ")
+
     while True:
         date = input("Enter date (YYYY-MM-DD): ")
 
@@ -89,16 +101,41 @@ def workout_menu():
             break
         else:
             print("Invalid date. Please use YYYY-MM-DD.")
-    sets = input("Enter number of sets: ")
-    reps = input("Enter number of reps: ")
-    weight = input("Enter weight used (kg): ")
 
-    print("\nWorkout  information")
-    print("Exercise: ",exercise)
-    print("Date: ",date)
-    print("Sets: ",sets)
-    print("Reps: ",reps)
-    print("Weight: ",weight)
+    sets = int(input("Enter number of sets: "))
+    reps = int(input("Enter number of reps: "))
+    weight = float(input("Enter weight used (kg): "))
+
+    log_workout(
+        exercise,
+        date,
+        sets,
+        reps,
+        weight
+    )
+    print("\nWorkout saved successfully!")
+
+
+def workout_history():
+    """Display all saved workout records."""
+    print("\n==============================")
+    print("       WORKOUT HISTORY")
+    print("==============================")
+
+    workouts = get_workout_history()
+
+    if not workouts:
+        print("No workout history found.")
+        return
+
+    for workout in workouts:
+        exercise, date, sets, reps, weight = workout
+
+        print("\nExercise:", exercise)
+        print("Date:", date)
+        print("Sets:", sets)
+        print("Reps:", reps)
+        print("Weight:", weight, "kg")
 
 
 def weekly_performance():
@@ -112,13 +149,16 @@ def weekly_performance():
 
 
 def main():
+    create_database()
+
+
     while True:
         show_menu()
 
         choice = input("Select menu: ")
 
         if not is_valid_menu_choice(choice):
-            print("\nInvalid choice. Please select 1-4.")
+            print("\nInvalid choice. Please select 1-5.")
             continue
 
         if choice == "1":
@@ -128,9 +168,12 @@ def main():
             workout_menu()
 
         elif choice == "3":
-            weekly_performance()
+            workout_history()
 
         elif choice == "4":
+            weekly_performance()
+
+        elif choice == "5":
             print("\nGoodbye!")
             break
 
