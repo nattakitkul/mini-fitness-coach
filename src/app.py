@@ -1,6 +1,9 @@
 import sys
+from datetime import datetime
 import tempfile
+from turtle import title
 import requests
+
 
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QMovie
@@ -11,12 +14,14 @@ from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
     QPushButton,
+    QMessageBox,
     QScrollArea,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 
+from src.database import log_workout
 from src.api import suggest_exercises
 
 class GifLoader(QThread):
@@ -394,36 +399,157 @@ class MainWindow(QMainWindow):
     # ==========================================
 
     def create_workouts_page(self):
-
         page = QWidget()
 
         layout = QVBoxLayout()
 
         title = QLabel(
-            "💪 Workout Programs"
+                "💪 Workout Programs"
         )
 
         title.setAlignment(
-            Qt.AlignCenter
-        )
-
-        info = QLabel(
-            "Workout programs will appear here."
-        )
-
-        info.setAlignment(
-            Qt.AlignCenter
+                Qt.AlignCenter
         )
 
         layout.addWidget(title)
-        layout.addWidget(info)
+
+        subtitle = QLabel(
+                "Choose a workout program"
+        )
+
+        subtitle.setAlignment(
+                Qt.AlignCenter
+        )
+
+        layout.addWidget(subtitle)
+
+        # ==============================
+        # Workout Programs
+        # ==============================
+
+        programs = [
+                {
+                        "name": "Beginner Full Body",
+                        "description": "A simple full-body workout for beginners.",
+                        "days": "3 Days / Week",
+                        "exercises": [
+                                "Push Up",
+                                "Bodyweight Squat",
+                                "Lat Pulldown",
+                                "Dumbbell Shoulder Press",
+                        ],
+                },
+                {
+                        "name": "Chest & Triceps",
+                        "description": "Focus on chest and triceps.",
+                        "days": "2 Days / Week",
+                        "exercises": [
+                                "Bench Press",
+                                "Cable Crossover",
+                                "Chest Fly",
+                                "Triceps Pushdown",
+                        ],
+                },
+                {
+                        "name": "Leg Day",
+                        "description": "Lower-body focused workout.",
+                        "days": "2 Days / Week",
+                        "exercises": [
+                                "Barbell Squat",
+                                "Leg Press",
+                                "Leg Extension",
+                                "Leg Curl",
+                                "Calf Raise",
+                        ],
+                },
+        ]
+
+        for program in programs:
+
+                card = QFrame()
+
+                card.setFrameShape(
+                        QFrame.StyledPanel
+                )
+
+                card.setMinimumHeight(150)
+
+                card_layout = QVBoxLayout()
+
+                name = QLabel(
+                        program["name"]
+                )
+
+                name.setAlignment(
+                        Qt.AlignCenter
+                )
+
+                card_layout.addWidget(name)
+
+                description = QLabel(
+                        program["description"]
+                )
+
+                description.setAlignment(
+                        Qt.AlignCenter
+                )
+
+                description.setWordWrap(True)
+
+                card_layout.addWidget(
+                        description
+                )
+
+                days = QLabel(
+                        program["days"]
+                )
+
+                days.setAlignment(
+                        Qt.AlignCenter
+                )
+
+                card_layout.addWidget(days)
+
+                exercise_count = QLabel(
+                        f'{len(program["exercises"])} Exercises'
+                )
+
+                exercise_count.setAlignment(
+                        Qt.AlignCenter
+                )
+
+                card_layout.addWidget(
+                        exercise_count
+                )
+
+                start_button = QPushButton(
+                        "▶ Start Workout"
+                )
+
+                start_button.clicked.connect(
+                lambda checked=False, p=program:
+                self.start_workout(p)
+                )
+
+                card_layout.addWidget(
+                        start_button
+                )
+
+                card.setLayout(
+                        card_layout
+                )
+
+                layout.addWidget(
+                        card
+                )
 
         layout.addStretch()
 
-        page.setLayout(layout)
+        page.setLayout(
+                layout
+        )
 
         return page
-
     # ==========================================
     # EXERCISES
     # ==========================================
@@ -799,6 +925,150 @@ class MainWindow(QMainWindow):
 
         self.pages.setCurrentIndex(
             index
+        )
+
+    def start_workout(self, program):
+
+        self.show_workout_session(program)
+
+    def show_workout_session(self, program):
+
+        page = QWidget()
+
+        layout = QVBoxLayout()
+
+        title = QLabel(
+            program["name"]
+        )
+
+        title.setAlignment(
+                Qt.AlignCenter
+        )
+
+        layout.addWidget(title)
+
+        push_up_data = suggest_exercises("chest")
+        
+
+        back_data = suggest_exercises("back")
+
+
+        lat_pulldown = None
+
+        for item in back_data:
+
+            if "machine front pulldown" in item.get("name", "").lower():
+
+                lat_pulldown = item
+
+                break
+        
+        push_up = None
+
+        for item in push_up_data:
+
+            if "push" in item.get("name", "").lower():
+                
+                push_up = item
+
+                break
+
+        if push_up:
+
+            push_up["name"] = "Push Up"
+
+            push_up_card = ExerciseCard(push_up)
+
+            layout.addWidget(push_up_card)
+
+            push_up_sets = QLabel(
+            "3 Sets × 10 Reps"
+            )
+
+            push_up_sets.setAlignment(
+            Qt.AlignCenter
+            )
+
+            layout.addWidget(
+            push_up_sets
+            )
+
+            push_up_button = QPushButton(
+                "▶ Start Push Up"
+            )
+
+            layout.addWidget(
+                push_up_button
+            )
+
+            push_up_button.clicked.connect(
+                lambda: self.show_exercise_detail(push_up)
+            )
+            
+        if lat_pulldown:
+
+            lat_pulldown["name"] = "Lat Pulldown"
+
+            lat_card = ExerciseCard(lat_pulldown)
+
+            layout.addWidget(lat_card)
+        lat_sets = QLabel(
+        "3 Sets × 10 Reps"
+        )
+
+        lat_sets.setAlignment(
+        Qt.AlignCenter
+        )
+
+        layout.addWidget(
+        lat_sets
+        )
+
+        page.setLayout(
+                layout
+        )
+
+        index = self.pages.addWidget(
+                page
+        )
+
+        self.pages.setCurrentIndex(
+                index
+        )
+        lat_button = QPushButton(
+            "▶ Start Lat Pulldown"
+        )
+
+        layout.addWidget(
+            lat_button
+        )
+
+        lat_button.clicked.connect(
+            lambda: self.show_exercise_detail(lat_pulldown)
+        )
+        
+        finish_button = QPushButton(
+            "✓ Finish Workout"
+        )
+
+        layout.addWidget(
+            finish_button   
+        )
+        finish_button.clicked.connect(
+            lambda: (
+            log_workout(
+                program["name"],
+                datetime.now().strftime("%Y-%m-%d"),
+                3,
+                10,
+                0
+            ),
+            QMessageBox.information(
+                self,
+                "Workout Completed",
+                "Workout logged successfully!"
+            )
+        )
         )
 
     def create_progress_page(self):
