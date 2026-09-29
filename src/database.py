@@ -60,7 +60,26 @@ def get_workout_history():
 
     return workouts
 
+def get_weekly_performance():
+    """Get workout statistics for the last 7 days."""
+    conn = sqlite3.connect(DATABASE)
 
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            COUNT(*) AS workout_count,
+            COUNT(DISTINCT exercise_name) AS exercise_frequency,
+            COALESCE(SUM(sets), 0) AS total_sets
+        FROM workouts
+        WHERE date >= date('now', '-6 days')
+    """)
+
+    result = cursor.fetchone()
+
+    conn.close()
+
+    return result
 
 if __name__ == "__main__":
     create_database()

@@ -1,5 +1,10 @@
 from datetime import datetime
-from src.database import create_database, log_workout, get_workout_history
+from src.database import (
+    create_database,
+    log_workout,
+    get_workout_history,
+    get_weekly_performance
+)
 from src.api import suggest_exercises
 
 
@@ -142,10 +147,12 @@ def weekly_performance():
     print("\n==============================")
     print("      WEEKLY PERFORMANCE")
     print("==============================")
-    print("Workout count: -")
-    print("Exercise frequency: -")
-    print("Total sets: -")
-    print("\nChart coming soon: -")
+
+    workout_count, exercise_frequency, total_sets = get_weekly_performance()
+
+    print("Workout count:", workout_count)
+    print("Exercise frequency:", exercise_frequency)
+    print("Total sets:", total_sets)
 
 
 def main():
