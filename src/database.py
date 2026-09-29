@@ -81,6 +81,26 @@ def get_weekly_performance():
 
     return result
 
+def get_weekly_sets():
+    """Get total sets for each of the last 7 days."""
+    conn = sqlite3.connect(DATABASE)
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT date, SUM(sets)
+        FROM workouts
+        WHERE date >= date('now', '-6 days')
+        GROUP BY date
+        ORDER BY date
+    """)
+
+    result = cursor.fetchall()
+
+    conn.close()
+
+    return result
+
 if __name__ == "__main__":
     create_database()
     print("Database created successfully.")

@@ -1,9 +1,12 @@
+import matplotlib.pyplot as plt
+
 from datetime import datetime
 from src.database import (
     create_database,
     log_workout,
     get_workout_history,
-    get_weekly_performance
+    get_weekly_performance,
+    get_weekly_sets
 )
 from src.api import suggest_exercises
 
@@ -142,6 +145,27 @@ def workout_history():
         print("Reps:", reps)
         print("Weight:", weight, "kg")
 
+def show_weekly_chart():
+    """Display a bar chart of sets completed each day."""
+    weekly_sets = get_weekly_sets()
+
+    dates = [row[0] for row in weekly_sets]
+    sets = [row[1] for row in weekly_sets]
+
+    if not dates:
+        print("No workout data available for the last 7 days.")
+        return
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(dates, sets)
+
+    plt.title("Weekly Workout Performance")
+    plt.xlabel("Date")
+    plt.ylabel("Total Sets")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.show()
 
 def weekly_performance():
     print("\n==============================")
@@ -153,6 +177,8 @@ def weekly_performance():
     print("Workout count:", workout_count)
     print("Exercise frequency:", exercise_frequency)
     print("Total sets:", total_sets)
+
+    show_weekly_chart()
 
 
 def main():
