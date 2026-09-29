@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime
 import tempfile
-from turtle import title
 import requests
 
 
@@ -1057,12 +1056,23 @@ class MainWindow(QMainWindow):
         finish_button.clicked.connect(
             lambda: (
             log_workout(
-                program["name"],
+                "Push Up",
                 datetime.now().strftime("%Y-%m-%d"),
                 3,
                 10,
                 0
             ),
+
+            log_workout(
+                "Lat Pulldown",
+                datetime.now().strftime("%Y-%m-%d"),
+                3,
+                10,
+                0
+            ),
+
+
+
             QMessageBox.information(
                 self,
                 "Workout Completed",
