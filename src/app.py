@@ -2,7 +2,7 @@ import sys
 from datetime import datetime
 import tempfile
 import requests
-
+import matplotlib.pyplot as plt
 
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QMovie
@@ -23,7 +23,8 @@ from PySide6.QtWidgets import (
 from src.database import (
     log_workout,
     get_workout_history,
-    get_weekly_performance
+    get_weekly_performance,
+    get_weekly_sets
 )
 from src.api import suggest_exercises
 
@@ -308,11 +309,7 @@ class MainWindow(QMainWindow):
         self.pages.addWidget(
             self.create_progress_page()
         )
-
-        self.pages.addWidget(
-            self.create_records_page()
-        )
-
+        
         self.pages.addWidget(
             self.create_goals_page()
         )
@@ -1084,37 +1081,6 @@ class MainWindow(QMainWindow):
             )
         )
         )
-
-    def create_progress_page(self):
-
-        page = QWidget()
-
-        layout = QVBoxLayout()
-
-        title = QLabel(
-            "📊 Progress"
-        )
-
-        title.setAlignment(
-            Qt.AlignCenter
-        )
-
-        info = QLabel(
-            "Your workout progress will appear here."
-        )
-
-        info.setAlignment(
-            Qt.AlignCenter
-        )
-
-        layout.addWidget(title)
-        layout.addWidget(info)
-
-        layout.addStretch()
-
-        page.setLayout(layout)
-
-        return page
 
     # ==========================================
     # RECORDS
