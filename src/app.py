@@ -20,7 +20,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from src.database import log_workout
+from src.database import (
+    log_workout,
+    get_workout_history,
+    get_weekly_performance
+)
 from src.api import suggest_exercises
 
 class GifLoader(QThread):
@@ -1116,34 +1120,51 @@ class MainWindow(QMainWindow):
     # RECORDS
     # ==========================================
 
-    def create_records_page(self):
+    def create_progress_page(self):
 
         page = QWidget()
 
         layout = QVBoxLayout()
 
         title = QLabel(
-            "🏆 Personal Records"
+            "Weekly Progress"
         )
 
         title.setAlignment(
             Qt.AlignCenter
         )
 
-        info = QLabel(
-            "Your personal records will appear here."
-        )
-
-        info.setAlignment(
-            Qt.AlignCenter
-        )
-
         layout.addWidget(title)
-        layout.addWidget(info)
+
+        workout_count, exercise_frequency, total_sets = (
+            get_weekly_performance()
+        )
+
+        workout_label = QLabel(
+            f"Workouts This Week: {workout_count}"
+        )
+
+        exercise_label = QLabel(
+            f"Exercises Completed: {exercise_frequency}"
+        )
+
+        sets_label = QLabel(
+            f"Total Sets: {total_sets}"
+        )
+
+        workout_label.setAlignment(Qt.AlignCenter)
+        exercise_label.setAlignment(Qt.AlignCenter)
+        sets_label.setAlignment(Qt.AlignCenter)
+
+        layout.addWidget(workout_label)
+        layout.addWidget(exercise_label)
+        layout.addWidget(sets_label)
 
         layout.addStretch()
 
-        page.setLayout(layout)
+        page.setLayout(
+            layout
+        )
 
         return page
 
