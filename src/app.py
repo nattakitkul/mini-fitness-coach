@@ -18,6 +18,7 @@ from PySide6.QtCore import Qt, QSize, QThread, Signal, Slot
 from PySide6.QtGui import QMovie
 from PySide6.QtWidgets import (
     QApplication,
+    QButtonGroup,
     QDoubleSpinBox,
     QFileDialog,
     QFrame,
@@ -61,6 +62,72 @@ HOME, WORKOUTS, EXERCISES, PROGRESS, RECORDS, GOALS, DETAIL, SESSION = range(8)
 
 EXERCISE_COLUMNS = 3
 EXERCISES_PER_BATCH = 12
+
+
+# ==========================================
+# STYLE (minimal, dark)
+# ==========================================
+
+STYLE = """
+QWidget {
+    color: #E6E6E8; font-size: 14px;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+QMainWindow, QDialog, QMessageBox { background: #0F0F10; }
+QMessageBox QLabel { color: #E6E6E8; }
+
+QWidget#sidebar { background: #141415; border-right: 1px solid #222225; }
+QWidget#sidebar QLabel { font-weight: 600; color: #F2F2F3; }
+QWidget#sidebar QPushButton {
+    background: transparent; color: #8E8E93; text-align: left;
+    padding: 10px 14px; border-radius: 8px; font-weight: 400;
+}
+QWidget#sidebar QPushButton:hover { background: #1C1C1E; color: #E6E6E8; }
+QWidget#sidebar QPushButton:pressed { background: #232326; }
+QWidget#sidebar QPushButton:checked {
+    background: #232326; color: #FFFFFF; font-weight: 600;
+}
+
+QPushButton {
+    background: #ECECEE; color: #111113; border: none;
+    border-radius: 8px; padding: 8px 16px; font-weight: 600;
+}
+QPushButton:hover { background: #FFFFFF; }
+QPushButton:pressed { background: #CFCFD3; }
+QPushButton:disabled { background: #2A2A2D; color: #6B6B70; }
+
+QPushButton#ghost {
+    background: transparent; color: #E6E6E8;
+    border: 1px solid #2E2E32; font-weight: 400;
+}
+QPushButton#ghost:hover { background: #1C1C1E; border-color: #44444A; }
+QPushButton#ghost:pressed { background: #232326; }
+
+QFrame[frameShape="6"] {
+    background: #17171A; border: 1px solid #242428; border-radius: 12px;
+}
+QScrollArea[frameShape="6"] { background: transparent; border: none; }
+QScrollArea > QWidget { background: transparent; }
+QScrollArea > QWidget > QWidget { background: transparent; }
+
+QSpinBox, QDoubleSpinBox {
+    background: #17171A; border: 1px solid #2E2E32;
+    border-radius: 8px; padding: 6px 10px;
+}
+QSpinBox:focus, QDoubleSpinBox:focus { border: 1px solid #8E8E93; }
+
+QScrollBar:vertical { background: transparent; width: 10px; margin: 0; }
+QScrollBar::handle:vertical {
+    background: #2E2E32; border-radius: 5px; min-height: 30px;
+}
+QScrollBar::handle:vertical:hover { background: #44444A; }
+QScrollBar:horizontal { background: transparent; height: 10px; margin: 0; }
+QScrollBar::handle:horizontal {
+    background: #2E2E32; border-radius: 5px; min-width: 30px;
+}
+QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }
+QScrollBar::add-page, QScrollBar::sub-page { background: none; }
+"""
 
 
 # ==========================================
@@ -182,7 +249,9 @@ def load_gif_into(label, url, size):
 def title_label(text):
     label = QLabel(text)
     label.setAlignment(Qt.AlignCenter)
-    label.setStyleSheet("font-size: 22px; font-weight: bold;")
+    label.setStyleSheet(
+        "font-size: 26px; font-weight: 600; color: #F2F2F3;"
+    )
     return label
 
 
@@ -272,6 +341,7 @@ class ExerciseDetailPage(QWidget):
         layout = QVBoxLayout()
 
         back_button = QPushButton("← Back")
+        back_button.setObjectName("ghost")
         back_button.clicked.connect(self.back_requested.emit)
         layout.addWidget(back_button)
 
@@ -417,11 +487,12 @@ class ExerciseBlock(QFrame):
         header = QHBoxLayout()
 
         name = QLabel(exercise.get("name", "Unknown Exercise"))
-        name.setStyleSheet("font-size: 16px; font-weight: bold;")
+        name.setStyleSheet("font-size: 16px; font-weight: 600;")
         name.setWordWrap(True)
         header.addWidget(name, 1)
 
         details_button = QPushButton("ℹ Details")
+        details_button.setObjectName("ghost")
         details_button.clicked.connect(
             lambda: self.details_requested.emit(self.exercise)
         )
@@ -435,10 +506,12 @@ class ExerciseBlock(QFrame):
         buttons = QHBoxLayout()
 
         add_button = QPushButton("+ Add set")
+        add_button.setObjectName("ghost")
         add_button.clicked.connect(self.add_set)
         buttons.addWidget(add_button)
 
         remove_button = QPushButton("− Remove set")
+        remove_button.setObjectName("ghost")
         remove_button.clicked.connect(self.remove_set)
         buttons.addWidget(remove_button)
 
@@ -514,6 +587,7 @@ class SessionPage(QWidget):
         header = QHBoxLayout()
 
         cancel_button = QPushButton("← Cancel workout")
+        cancel_button.setObjectName("ghost")
         cancel_button.clicked.connect(self.cancelled.emit)
         header.addWidget(cancel_button)
 
@@ -644,6 +718,26 @@ class ProgressPage(QWidget):
         labels, values = weekly_chart_data()
 
         draw_weekly_chart(self.axes, labels, values)
+
+        # Minimal dark look: light bars, faint grid, no top/right frame lines.
+        background, text, muted, line = "#0F0F10", "#E6E6E8", "#8E8E93", "#2E2E32"
+
+        for bar in self.axes.patches:
+            bar.set_color(text)
+
+        self.figure.set_facecolor(background)
+        self.axes.set_facecolor(background)
+        self.axes.spines[["top", "right"]].set_visible(False)
+        self.axes.spines[["left", "bottom"]].set_color(line)
+        self.axes.tick_params(colors=muted)
+        self.axes.title.set_color(text)
+        self.axes.yaxis.label.set_color(muted)
+        self.axes.set_axisbelow(True)
+        self.axes.yaxis.grid(True, color="#1E1E21")
+
+        for note in self.axes.texts:
+            note.set_color(muted)
+
         self.figure.tight_layout()
         self.canvas.draw_idle()
 
@@ -734,7 +828,7 @@ class RecordsPage(QWidget):
 
         # Personal bests
         heading = QLabel("Personal bests")
-        heading.setStyleSheet("font-size: 16px; font-weight: bold;")
+        heading.setStyleSheet("font-size: 16px; font-weight: 600;")
         self.content_layout.addWidget(heading)
 
         for name, best_weight, best_reps in records:
@@ -745,7 +839,7 @@ class RecordsPage(QWidget):
         # History, newest first
         heading = QLabel("History")
         heading.setStyleSheet(
-            "font-size: 16px; font-weight: bold; margin-top: 16px;"
+            "font-size: 16px; font-weight: 600; margin-top: 16px;"
         )
         self.content_layout.addWidget(heading)
 
@@ -756,7 +850,7 @@ class RecordsPage(QWidget):
             card_layout = QVBoxLayout()
 
             header = QLabel(f"{session['date']} — {session['name']}")
-            header.setStyleSheet("font-weight: bold;")
+            header.setStyleSheet("font-weight: 600;")
             card_layout.addWidget(header)
 
             for exercise in session["exercises"]:
@@ -790,15 +884,20 @@ class MainWindow(QMainWindow):
         self.exercise_shown = 0
 
         main_layout = QHBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
         # ------------------------------
         # Sidebar
         # ------------------------------
 
         sidebar = QWidget()
+        sidebar.setObjectName("sidebar")
+        sidebar.setAttribute(Qt.WA_StyledBackground, True)
         sidebar.setFixedWidth(220)
 
         sidebar_layout = QVBoxLayout()
+        sidebar_layout.setContentsMargins(16, 24, 16, 24)
 
         sidebar_layout.addWidget(centered_label("🏋️\nMini Fitness Coach"))
         sidebar_layout.addSpacing(30)
@@ -812,12 +911,22 @@ class MainWindow(QMainWindow):
             ("🎯  Goals", GOALS),
         ]
 
+        # Checkable buttons: the one for the open page stays highlighted.
+        self.nav_buttons = {}
+        nav_group = QButtonGroup(self)
+        nav_group.setExclusive(True)
+
         for text, index in nav:
             button = QPushButton(text)
+            button.setCheckable(True)
             button.clicked.connect(
                 lambda checked=False, i=index: self.go(i)
             )
+            nav_group.addButton(button)
+            self.nav_buttons[index] = button
             sidebar_layout.addWidget(button)
+
+        self.nav_buttons[HOME].setChecked(True)
 
         sidebar_layout.addStretch()
         sidebar.setLayout(sidebar_layout)
@@ -856,6 +965,10 @@ class MainWindow(QMainWindow):
             self.detail_page,               # DETAIL
             self.session_page,              # SESSION
         ]:
+            # More breathing room around every page.
+            page.layout().setContentsMargins(32, 28, 32, 28)
+            page.layout().setSpacing(12)
+
             self.pages.addWidget(page)
 
         # Progress and Records re-read the database every time they are opened.
@@ -874,6 +987,11 @@ class MainWindow(QMainWindow):
 
     def go(self, index):
         self.pages.setCurrentIndex(index)
+
+        button = self.nav_buttons.get(index)
+
+        if button:
+            button.setChecked(True)
 
     def on_page_changed(self, index):
         if index == PROGRESS:
@@ -972,7 +1090,7 @@ class MainWindow(QMainWindow):
             card_layout = QVBoxLayout()
 
             name = centered_label(program["name"])
-            name.setStyleSheet("font-size: 16px; font-weight: bold;")
+            name.setStyleSheet("font-size: 16px; font-weight: 600;")
             card_layout.addWidget(name)
 
             card_layout.addWidget(centered_label(program["description"], True))
@@ -1011,6 +1129,7 @@ class MainWindow(QMainWindow):
 
         for muscle in ["chest", "back", "legs", "shoulders", "arms", "abs"]:
             button = QPushButton(muscle.capitalize())
+            button.setObjectName("ghost")
             button.clicked.connect(
                 lambda checked=False, m=muscle: self.load_exercises(m)
             )
@@ -1033,6 +1152,7 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(scroll, 1)
 
         self.more_button = QPushButton("Show more")
+        self.more_button.setObjectName("ghost")
         self.more_button.clicked.connect(self.show_more_exercises)
         self.more_button.hide()
         main_layout.addWidget(self.more_button)
@@ -1120,6 +1240,7 @@ def main():
     create_database()
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(STYLE)
     app.aboutToQuit.connect(cleanup)
 
     window = MainWindow()
