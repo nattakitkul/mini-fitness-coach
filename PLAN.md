@@ -27,12 +27,12 @@
 
 ## 3. ภาพรวม Sprint
 
-| Sprint | หัวข้อหลัก | ผลลัพธ์ | วันส่ง | สถานะ |
-|--------|-----------|---------|--------|-------|
-| Sprint 1 | CLI Interface & Input Validation | CLI Prototype, pytest 9 tests ผ่าน | TODO | เสร็จแล้ว |
-| Sprint 2 | Core Workout Features | API + SQLite + Logger + Weekly Chart, pytest 13 tests ผ่าน | TODO | เสร็จแล้ว |
-| Sprint 3 | GUI Application & User Experience | Desktop GUI ด้วย PySide6 | TODO | เสร็จแล้ว (มี Technical Issues ที่แก้ใน Final Sprint) |
-| Final Sprint | Stability, Testing, DevOps & Documentation | ระบบเสถียร, เทสและ CI ครบ, เอกสารสมบูรณ์ | TODO | กำลังดำเนินการ |
+| Sprint | หัวข้อหลัก | ผลลัพธ์ | สถานะ |
+|--------|-----------|---------|-------|
+| Sprint 1 | CLI Interface & Input Validation | CLI Prototype, pytest 9 tests ผ่าน | เสร็จแล้ว |
+| Sprint 2 | Core Workout Features | API + SQLite + Logger + Weekly Chart, pytest 13 tests ผ่าน | เสร็จแล้ว |
+| Sprint 3 | GUI Application & User Experience | Desktop GUI ด้วย PySide6 | เสร็จแล้ว (มี Technical Issues ที่แก้ใน Final Sprint) |
+| Final Sprint | Stability, Testing, DevOps & Documentation | ระบบเสถียร, เทสและ CI ครบ, เอกสารสมบูรณ์ | กำลังดำเนินการ |
 
 ---
 
@@ -116,20 +116,8 @@ GUI ใช้งาน Exercise Library, Workouts, Records และ Progress �
 - [x] Refactor: `charts.py` ใช้ร่วมกันทั้ง GUI และ CLI, pure functions ใน `analysis.py`
 - [x] จัดทำ `README.md`, `plan.md`
 
-### งานที่ยังต้องทำ
-- [ ] **TODO – แก้ `tests/test_database.py`** ให้ใช้ `save_session`, `get_history`, `get_personal_records`, `get_weekly_performance` (ตอนนี้เรียกฟังก์ชันและตารางเดิมที่ไม่มีแล้ว)
-- [ ] **TODO – แยกเทสใน `test_main.py` ออกจากฐานข้อมูลจริง** ด้วย `tmp_path` + `monkeypatch`
-- [ ] **TODO – เพิ่มเทสสำหรับ `analysis.py`** (`last_7_days`, `fill_missing_days`, `history_to_rows`, `export_history_csv`)
-- [ ] **TODO – เพิ่ม API Mock Test** สำหรับ `api.py` (mock `requests.get` ไม่เรียก network จริง)
-- [ ] **TODO – ตั้งค่า GitHub Actions** รัน `flake8` + `pytest` อัตโนมัติเมื่อ push / Pull Request และยืนยันสถานะเขียว
-- [ ] **TODO – ตรวจ `requirements.txt`** ให้มี PySide6, matplotlib, requests, pytest, flake8
-- [ ] **TODO – หน้า Home และ Goals** ทำให้เสร็จหรือตัดออก
-- [ ] **TODO – ตรวจ PEP8/lint** ด้วย `flake8`
-- [ ] **TODO – ทดสอบบนเครื่องที่สะอาด** และซ้อมนำเสนอ Live Demo
-
 ### Definition of Done
 - `pytest` ผ่านทั้งหมด (รวมเทสใหม่) และ CI ขึ้นเขียวบน GitHub
-- ไม่มีเทสที่เขียนลงฐานข้อมูลจริง
 - README, plan และรายงาน Sprint ตรงกับโปรเจกต์จริง
 - โปรแกรมรันได้บนเครื่องที่ติดตั้งจาก `requirements.txt`
 
@@ -166,7 +154,7 @@ GUI ใช้งาน Exercise Library, Workouts, Records และ Progress �
 | CSV Export | ทำแล้ว (Stretch) |
 | AI Feature | ยังไม่ได้ทำ (Stretch) |
 
-## 10. ความเสี่ยงและแนวทางรับมือ
+## 10. ความเสี่ยงและแนวทางรับมือs
 
 | ความเสี่ยง | แนวทางรับมือ |
 |-----------|--------------|
