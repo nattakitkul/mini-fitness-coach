@@ -139,14 +139,6 @@ python -m src.main
 
 เมื่อลบ session เซ็ตที่เกี่ยวข้องจะถูกลบตาม (`ON DELETE CASCADE`) ตาราง `workouts` แบบเดิมจะถูกเปลี่ยนชื่อเป็น `workouts_legacy` หลัง migration (ไม่ลบข้อมูล)
 
-## การทดสอบ
-
-```bash
-pytest
-```
-
-> **สถานะ:** **TODO – กรอกผลรัน pytest ล่าสุด** (หมายเหตุ: `tests/test_database.py` ต้องอัปเดตให้ตรงกับโครงสร้าง `sessions`/`sets` ใหม่)
-
 ## ข้อควรรู้
 
 - `src/api.py` ตั้ง `VERIFY_SSL = False` ตามโปรแกรมเดิม ถ้าเครือข่ายรองรับให้เปลี่ยนเป็น `True`
