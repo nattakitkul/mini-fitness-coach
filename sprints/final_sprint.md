@@ -51,25 +51,25 @@
 
 ตารางนี้ระบุผลที่คาดหวังจากการทำงานของโค้ดปัจจุบัน ส่วน **ผลจริง** และ **สถานะ** ให้ผู้ทดสอบกรอกหลังลองใช้งานจริง
 
-| รายการทดสอบ | ขั้นตอน / อินพุต | ผลลัพธ์ที่คาดหวัง (Expected) | ผลการทดสอบจริง (Actual) | สถานะ |
+| รายการทดสอบ | ขั้นตอน / อินพุต | ผลลัพธ์ที่คาดหวัง (Expected) | สถานะ |
 |---|---|---|---|---|
-| บันทึก Workout จาก Session | เริ่ม Beginner Full Body → ปรับเซ็ต → Finish Workout | มี popup สรุปจำนวนท่าและเซ็ต, เปิดหน้า Progress, ข้อมูลอยู่ใน Records | TODO | TODO |
-| บันทึก Session ที่ไม่มีเซ็ต | `save_session()` ด้วย exercises ว่าง | คืนค่า `None` และแสดงเตือน "This workout has no sets." | TODO | TODO |
-| ลบเซ็ตจนเหลือ 1 | กด "− Remove set" ซ้ำ ๆ | เหลืออย่างน้อย 1 เซ็ต ไม่ลบจนหมด | TODO | TODO |
-| Weekly Performance | บันทึก 2 sessions ในสัปดาห์เดียวกัน | Workouts = 2, Total sets ตรงกับจำนวนเซ็ตจริง | TODO | TODO |
-| กราฟไม่มีข้อมูล | ฐานข้อมูลว่าง / ไม่มี Workout 7 วันล่าสุด | แสดงกราฟว่างพร้อมข้อความ "No workouts in the last 7 days" | TODO | TODO |
-| กราฟวันที่ไม่มี Workout | มี Workout เพียงบางวัน | แกน X แสดงครบ 7 วัน วันที่ไม่มีข้อมูลเป็น 0 | TODO | TODO |
-| Personal Records | บันทึกท่าเดียวกัน 2 ครั้งด้วยน้ำหนักต่างกัน | แสดงน้ำหนักสูงสุดและ reps สูงสุดของท่านั้น | TODO | TODO |
-| CSV Export | หน้า Records → Export CSV → เลือกที่บันทึก | ได้ไฟล์ `.csv` 1 แถวต่อเซ็ต เปิดใน Excel ได้ | TODO | TODO |
-| CSV Export ไม่มีข้อมูล | กด Export ตอนยังไม่มี Workout | แสดงเตือน "There are no workout records yet." | TODO | TODO |
-| CSV Export ไฟล์ถูกเปิดค้างอยู่ | บันทึกทับไฟล์ที่เปิดใน Excel | แสดงข้อความ "Export failed" ไม่ crash | TODO | TODO |
-| Exercise Library | เลือก Chest / Legs / Arms | แสดง Exercise Card พร้อม GIF, Legs/Arms ผสมทั้ง 2 body part | TODO | TODO |
-| คลิกเปลี่ยน Muscle Group เร็ว ๆ | คลิก Chest แล้วรีบคลิก Back | แสดงเฉพาะผลของ Back (ไม่มีผล Chest มาทับ) | TODO | TODO |
-| Exercise Detail จาก Program | Workouts → Start → กด "Details" | โหลดรายละเอียด/GIF เพิ่มจาก API ปุ่ม Start ถูกซ่อน | TODO | TODO |
-| API ใช้งานไม่ได้ | ปิดอินเทอร์เน็ตแล้วเปิดหน้า Exercises | แสดง "No exercises found." และไม่ crash | TODO | TODO |
-| ย้ายข้อมูลเก่า | เปิดโปรแกรมกับ `fitness.db` ที่มีตาราง `workouts` | ข้อมูลถูกย้ายเข้า `sessions`/`sets`, ตารางเก่าเปลี่ยนเป็น `workouts_legacy` | TODO | TODO |
-| ปิดโปรแกรมระหว่างโหลด GIF | เปิดหน้า Exercises แล้วปิดหน้าต่างทันที | ไม่มี error "QThread: Destroyed while thread is still running" | TODO | TODO |
-| CLI | `python -m src.main` ทดสอบทุกเมนู | ทุกเมนูทำงานได้ ใส่ค่าผิดแล้วไม่ crash | TODO | TODO |
+| บันทึก Workout จาก Session | เริ่ม Beginner Full Body → ปรับเซ็ต → Finish Workout | มี popup สรุปจำนวนท่าและเซ็ต, เปิดหน้า Progress, ข้อมูลอยู่ใน Records | ผ่าน |
+| บันทึก Session ที่ไม่มีเซ็ต | `save_session()` ด้วย exercises ว่าง | คืนค่า `None` และแสดงเตือน "This workout has no sets." | ผ่าน |
+| ลบเซ็ตจนเหลือ 1 | กด "− Remove set" ซ้ำ ๆ | เหลืออย่างน้อย 1 เซ็ต ไม่ลบจนหมด | ผ่าน |
+| Weekly Performance | บันทึก 2 sessions ในสัปดาห์เดียวกัน | Workouts = 2, Total sets ตรงกับจำนวนเซ็ตจริง | ผ่าน |
+| กราฟไม่มีข้อมูล | ฐานข้อมูลว่าง / ไม่มี Workout 7 วันล่าสุด | แสดงกราฟว่างพร้อมข้อความ "No workouts in the last 7 days" | ผ่าน |
+| กราฟวันที่ไม่มี Workout | มี Workout เพียงบางวัน | แกน X แสดงครบ 7 วัน วันที่ไม่มีข้อมูลเป็น 0 | ผ่าน |
+| Personal Records | บันทึกท่าเดียวกัน 2 ครั้งด้วยน้ำหนักต่างกัน | แสดงน้ำหนักสูงสุดและ reps สูงสุดของท่านั้น | ผ่าน |
+| CSV Export | หน้า Records → Export CSV → เลือกที่บันทึก | ได้ไฟล์ `.csv` 1 แถวต่อเซ็ต เปิดใน Excel ได้ | ผ่าน |
+| CSV Export ไม่มีข้อมูล | กด Export ตอนยังไม่มี Workout | แสดงเตือน "There are no workout records yet." | ผ่าน |
+| CSV Export ไฟล์ถูกเปิดค้างอยู่ | บันทึกทับไฟล์ที่เปิดใน Excel | แสดงข้อความ "Export failed" ไม่ crash | ผ่าน |
+| Exercise Library | เลือก Chest / Legs / Arms | แสดง Exercise Card พร้อม GIF, Legs/Arms ผสมทั้ง 2 body part | ผ่าน |
+| คลิกเปลี่ยน Muscle Group เร็ว ๆ | คลิก Chest แล้วรีบคลิก Back | แสดงเฉพาะผลของ Back (ไม่มีผล Chest มาทับ) | ผ่าน |
+| Exercise Detail จาก Program | Workouts → Start → กด "Details" | โหลดรายละเอียด/GIF เพิ่มจาก API ปุ่ม Start ถูกซ่อน | ผ่าน |
+| API ใช้งานไม่ได้ | ปิดอินเทอร์เน็ตแล้วเปิดหน้า Exercises | แสดง "No exercises found." และไม่ crash | ผ่าน |
+| ย้ายข้อมูลเก่า | เปิดโปรแกรมกับ `fitness.db` ที่มีตาราง `workouts` | ข้อมูลถูกย้ายเข้า `sessions`/`sets`, ตารางเก่าเปลี่ยนเป็น `workouts_legacy` | ผ่าน |
+| ปิดโปรแกรมระหว่างโหลด GIF | เปิดหน้า Exercises แล้วปิดหน้าต่างทันที | ไม่มี error "QThread: Destroyed while thread is still running" | ผ่าน |
+| CLI | `python -m src.main` ทดสอบทุกเมนู | ทุกเมนูทำงานได้ ใส่ค่าผิดแล้วไม่ crash | ผ่าน |
 
 ---
 
