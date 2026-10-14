@@ -1,288 +1,177 @@
+# Project Plan — Mini Fitness Coach
 
-# PLAN.md — Mini Fitness Coach
+แผนการพัฒนาโปรเจกต์ Mini Fitness Coach แบ่งเป็น 4 Sprint: Sprint 1, Sprint 2, Sprint 3 และ Final Sprint
 
-## ภาพรวมโปรเจกต์
+> หัวข้อที่ขึ้นต้นด้วย `TODO` เป็นข้อมูลที่ทีมต้องกรอกหรือยืนยันเอง
 
-**Mini Fitness Coach** คือแอปพลิเคชัน Python สำหรับช่วยผู้ใช้ค้นหาข้อมูลท่าออกกำลังกาย จัดการโปรแกรมฝึก บันทึกประวัติการออกกำลังกาย และติดตามผลการฝึกผ่านข้อมูลสถิติและกราฟ
+## 1. ภาพรวมโปรเจกต์
 
-โปรเจกต์พัฒนาจากแอปพลิเคชัน Command-Line Interface (CLI) ไปสู่ Desktop Application ที่ใช้ PySide6 โดยแบ่งการพัฒนาออกเป็น 3 Sprint และมีการทดสอบระบบด้วย pytest
+| หัวข้อ | รายละเอียด |
+|--------|-----------|
+| ชื่อโปรเจกต์ | Mini Fitness Coach |
+| Domain | Health / Fitness Application |
+| ภาษาและเครื่องมือ | Python, PySide6, SQLite, matplotlib, requests, pytest |
+| API | ExerciseDB API (V1 Free API) — https://exercisedb.dev/ |
+| Programming Style | Functional Programming Style + Modular Architecture |
+| Repository | https://github.com/nattakitkul/mini-fitness-coach |
 
-ระบบประกอบด้วยส่วนสำคัญ ได้แก่
+**เป้าหมาย:** สร้างโปรแกรมที่แนะนำท่าออกกำลังกายตามกลุ่มกล้ามเนื้อจาก ExerciseDB API บันทึก Workout ลง SQLite และวิเคราะห์ Performance รายสัปดาห์พร้อมกราฟ โดยมีโครงสร้างแบบ Modular, Unit Tests และ CI/CD
 
-* **Exercise Information** — ดึงข้อมูลท่าออกกำลังกายจาก Exercise API
-* **Workout Programs** — แสดงโปรแกรมออกกำลังกายและท่าที่เกี่ยวข้อง
-* **Workout Session** — แสดงรายละเอียดการฝึก จำนวนเซตและจำนวนครั้ง
-* **Workout Logging** — บันทึกข้อมูลการออกกำลังกายลง SQLite
-* **Workout History** — เรียกดูประวัติการออกกำลังกายที่บันทึกไว้
-* **Performance Tracking** — คำนวณสถิติการออกกำลังกายรายสัปดาห์
-* **Data Visualization** — แสดงข้อมูลสถิติด้วย Matplotlib
-* **Desktop GUI** — ให้ผู้ใช้ใช้งานผ่านหน้าต่างโปรแกรมด้วย PySide6
+## 2. บทบาทในทีม
 
-**Domain:** Fitness Application
+| ชื่อ | บทบาท | หน้าที่ |
+|------|-------|---------|
+| นายนันทกร โนนกลาง | Project Manager / CI-CD Integrator | วางแผน Sprint และลำดับการพัฒนา, ออกแบบ Program Flow/Menu, วางโครงสร้าง SQLite, จัดทำเอกสาร, ติดตามความคืบหน้า, จัดการ GitHub และ CI/CD |
+| นายณัฐกิตติ์ กุลวงศ์ | Automated Tester & QA | เขียนและรัน Unit Tests ด้วย `pytest`, ทดสอบ API/Exception Handling/SQLite, ตรวจ Edge Cases และ Invalid Inputs, ค้นหาและแก้ Bugs |
+| นายวรากร โสภา | Core Developer | พัฒนาและเชื่อมต่อ ExerciseDB API, Exercise Suggestion, Workout Logger, Weekly Performance + Chart และเชื่อมต่อส่วนต่างๆ ของระบบ |
 
-**Programming Language:** Python
+## 3. ภาพรวม Sprint
 
-**Framework:** PySide6
-
-**Programming Style:** Modular Programming
-
-**Database:** SQLite
-
-**Testing Framework:** pytest
-
-**Repository:** https://github.com/nattakitkul/mini-fitness-coach
-
----
-
-## สถาปัตยกรรมของระบบ
-
-โปรเจกต์แบ่งความรับผิดชอบออกเป็นโมดูล เพื่อให้แต่ละส่วนดูแลหน้าที่ของตนเองและสามารถทดสอบแยกกันได้
-
-| Layer / Component         | ไฟล์                   | หน้าที่                                                                                        |
-| ------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Presentation Layer — CLI | `src/main.py`            | ส่วนติดต่อผู้ใช้ผ่าน Command Line                                                 |
-| Presentation Layer — GUI | `src/app.py`             | หน้าต่างโปรแกรมและส่วนติดต่อผู้ใช้ด้วย PySide6                  |
-| Data API Integration      | `src/api.py`             | ติดต่อ Exercise API และประมวลผลข้อมูลท่าออกกำลังกาย              |
-| Data Access Layer         | `src/database.py`        | สร้างฐานข้อมูล บันทึกและเรียกดูข้อมูลการออกกำลังกาย |
-| Data Storage              | `data/fitness.db`        | จัดเก็บประวัติการออกกำลังกายด้วย SQLite                               |
-| Testing                   | `tests/test_database.py` | ทดสอบฟังก์ชันที่เกี่ยวข้องกับฐานข้อมูล                          |
-| Testing                   | `tests/test_main.py`     | ทดสอบฟังก์ชันของโมดูลหลัก                                                    |
-
-> หมายเหตุ: ตารางนี้อ้างอิงโครงสร้างไฟล์ที่ปรากฏระหว่างการพัฒนา ควรตรวจสอบกับ Repository เวอร์ชันล่าสุดก่อนส่งงาน
+| Sprint | หัวข้อหลัก | ผลลัพธ์ | วันส่ง | สถานะ |
+|--------|-----------|---------|--------|-------|
+| Sprint 1 | CLI Interface & Input Validation | CLI Prototype, pytest 9 tests ผ่าน | TODO | เสร็จแล้ว |
+| Sprint 2 | Core Workout Features | API + SQLite + Logger + Weekly Chart, pytest 13 tests ผ่าน | TODO | เสร็จแล้ว |
+| Sprint 3 | GUI Application & User Experience | Desktop GUI ด้วย PySide6 | TODO | เสร็จแล้ว (มี Technical Issues ที่แก้ใน Final Sprint) |
+| Final Sprint | Stability, Testing, DevOps & Documentation | ระบบเสถียร, เทสและ CI ครบ, เอกสารสมบูรณ์ | TODO | กำลังดำเนินการ |
 
 ---
 
-## Sprint 1 — Front-End App Dev
+## 4. Sprint 1 — CLI Interface & Input Validation
 
-**เป้าหมาย:** สร้างโครงสร้างแอปพลิเคชันเบื้องต้น ออกแบบการโต้ตอบกับผู้ใช้ และพัฒนาฟังก์ชันหลักสำหรับการแนะนำหรือค้นหาข้อมูลท่าออกกำลังกาย
+**เป้าหมาย:** สร้างโครงสร้างพื้นฐานของโปรแกรมผ่าน CLI ให้ผู้ใช้เลือกเมนู กรอกข้อมูล และมีการตรวจสอบ Input พร้อมทดสอบด้วย pytest
 
-### ขอบเขตระบบ
+### งานที่ทำ
+- [x] สร้างโครงสร้างโปรเจกต์ Python และใช้ Git/GitHub
+- [x] สร้าง Main Menu, Exercise Suggestion Menu, Workout Logger Menu, Weekly Performance Menu
+- [x] เพิ่มการตรวจสอบ `is_valid_menu_choice()`, `is_valid_exercise_choice()`, `is_valid_date()` (รูปแบบ `YYYY-MM-DD`)
+- [x] จัดการกรณีผู้ใช้กรอกข้อมูลไม่ถูกต้อง
+- [x] เขียน Unit Tests 9 รายการ (ผลรัน: 9 passed)
 
-* สร้างโครงสร้างโปรเจกต์ Python
-* พัฒนา Command-Line Interface สำหรับการใช้งานเบื้องต้น
-* รับข้อมูลจากผู้ใช้และตรวจสอบความถูกต้อง
-* แยกส่วนการทำงานออกเป็นโมดูล
-* สร้างฟังก์ชันหลักสำหรับจัดการข้อมูลและแสดงผล
-* เตรียมโครงสร้างสำหรับการเพิ่ม Exercise API และฐานข้อมูลใน Sprint ถัดไป
-
-### Definition of Done (DoD)
-
-* [X] สามารถเริ่มต้นแอปพลิเคชันได้
-* [X] ผู้ใช้สามารถโต้ตอบกับโปรแกรมผ่าน CLI ได้
-* [X] มีการตรวจสอบข้อมูลนำเข้าที่จำเป็น
-* [X] โปรแกรมจัดการข้อมูลนำเข้าที่ไม่ถูกต้องได้อย่างเหมาะสม
-* [X] โค้ดแบ่งเป็นโมดูลตามหน้าที่
-* [X] มีการทดสอบฟังก์ชันหลักตามขอบเขตของ Sprint
-
-### ผลลัพธ์ที่คาดหวัง
-
-* แอปพลิเคชัน Python เวอร์ชันเริ่มต้น
-* โครงสร้างโปรเจกต์ที่รองรับการพัฒนาต่อ
-* ฟังก์ชันพื้นฐานสำหรับการทำงานด้าน Fitness
-
-### สถานะ
-
-รายละเอียดของ Sprint 1 ควรตรวจสอบจากประวัติ Git และไฟล์รายงาน Sprint เพื่อยืนยันฟังก์ชันที่ทำเสร็จจริง
-
----
-
-## Sprint 2 — Back-End App Dev
-
-**เป้าหมาย:** เชื่อมต่อข้อมูลท่าออกกำลังกายจากภายนอก จัดเก็บประวัติการออกกำลังกายด้วย SQLite และเพิ่มความสามารถในการวิเคราะห์ผลการฝึก
-
-### ขอบเขตระบบ
-
-#### 1. Exercise API Integration
-
-* ใช้ Requests สำหรับส่ง HTTP requests ไปยัง Exercise API
-* รับข้อมูลท่าออกกำลังกายจาก API
-* ประมวลผลข้อมูลที่ได้รับเพื่อนำไปแสดงในแอปพลิเคชัน
-* รองรับข้อมูลที่จำเป็นต่อการแสดงรายละเอียดท่าออกกำลังกายตามข้อมูลที่ API ส่งกลับมา
-
-#### 2. Database Integration
-
-* สร้างฐานข้อมูล SQLite
-* จัดเตรียมตาราง `workouts` สำหรับบันทึกประวัติการฝึก
-* พัฒนาฟังก์ชัน `log_workout()` สำหรับบันทึกข้อมูล
-* พัฒนาฟังก์ชัน `get_workout_history()` สำหรับเรียกดูประวัติ
-* รองรับการบันทึกชื่อท่า วันที่ จำนวนเซต จำนวนครั้ง และน้ำหนัก
-
-#### 3. Performance Tracking
-
-* รวบรวมข้อมูลการออกกำลังกายจากฐานข้อมูล
-* คำนวณสถิติการออกกำลังกายรายสัปดาห์
-* คำนวณจำนวนเซตจากข้อมูลประวัติการฝึก
-* เตรียมข้อมูลสำหรับการแสดงผลสถิติ
-
-#### 4. Data Visualization
-
-* ใช้ Matplotlib สำหรับการสร้างกราฟ
-* นำข้อมูลประวัติการฝึกมาใช้ประกอบการแสดงผล
-* เชื่อมโยงข้อมูลสถิติกับฟังก์ชันรายงานผลตามที่พัฒนาไว้
-
-#### 5. Automated Testing
-
-* ใช้ pytest สำหรับทดสอบฟังก์ชัน
-* ทดสอบการสร้างฐานข้อมูล
-* ทดสอบการบันทึกข้อมูลการออกกำลังกาย
-* ทดสอบการเรียกดูประวัติการฝึก
-
-### Definition of Done (DoD)
-
-* [X] มีโมดูลฐานข้อมูล `src/database.py`
-* [X] สามารถสร้างฐานข้อมูล SQLite ได้
-* [X] สามารถบันทึก workout records ได้
-* [X] สามารถเรียกดูประวัติการออกกำลังกายได้
-* [X] มี automated tests สำหรับการทำงานหลักของฐานข้อมูล
-* [X] ทดสอบชุดข้อมูลตัวอย่างได้ตรงกับข้อมูลที่บันทึกไว้
-
-### การทดสอบ
-
-ระหว่างการพัฒนา มีการทดสอบฐานข้อมูลด้วยข้อมูลตัวอย่าง เช่น `Bench Press` และ `Squat` รวมถึงตรวจสอบจำนวนเซต จำนวนครั้ง และน้ำหนักที่บันทึกไว้
-
-นอกจากนี้ มีการติดตั้ง Matplotlib เพื่อให้โมดูลหลักสามารถนำเข้าไลบรารีที่จำเป็นต่อการแสดงกราฟได้
-
-### ผลลัพธ์ที่คาดหวัง
-
-* ระบบเชื่อมต่อ Exercise API
-* ระบบจัดเก็บและเรียกดูประวัติการออกกำลังกาย
-* ฟังก์ชันวิเคราะห์ข้อมูลการฝึก
-* กราฟแสดงผลสถิติ
-* ชุดทดสอบสำหรับตรวจสอบการทำงาน
-
-### สถานะ
-
-ส่วนฐานข้อมูลและ automated tests ได้รับการทดสอบแล้ว ส่วนรายละเอียดอื่นควรตรวจสอบจากโค้ดและรายงาน Sprint ก่อนยืนยันความครบถ้วน
-
----
-
-## Sprint 3 — Desktop GUI Integration
-
-**เป้าหมาย:** พัฒนา Desktop GUI ด้วย PySide6 และเชื่อมต่อส่วนติดต่อผู้ใช้เข้ากับระบบบันทึกข้อมูลการออกกำลังกาย
-
-### ขอบเขตระบบ
-
-#### 1. Desktop Application
-
-* พัฒนา GUI ด้วย PySide6
-* สร้างหน้าต่างหลักสำหรับการใช้งาน
-* ใช้ Layout และ Widget เพื่อจัดวางองค์ประกอบของหน้าจอ
-* แสดงข้อมูลท่าออกกำลังกายผ่านส่วนติดต่อผู้ใช้
-
-#### 2. Exercise Library
-
-* แสดงรายการท่าออกกำลังกาย
-* ใช้ Exercise Card แสดงข้อมูลแต่ละท่า
-* แสดงรายละเอียดของท่าเมื่อผู้ใช้เลือก
-* รองรับการแสดงภาพหรือ GIF สาธิตท่าเมื่อมีข้อมูล
-
-#### 3. Workout Programs
-
-* แสดงโปรแกรมออกกำลังกาย
-* แสดงท่าที่อยู่ภายในโปรแกรม
-* แสดงจำนวนเซตและจำนวนครั้ง
-* เพิ่มปุ่มสำหรับเริ่มดูรายละเอียดท่าออกกำลังกาย
-
-#### 4. Workout Session
-
-* แสดงรายการท่าในเซสชัน
-* แสดงรายละเอียดการฝึก เช่น `3 Sets × 10 Reps`
-* เพิ่มปุ่ม `Start Push Up`
-* เพิ่มปุ่ม `Start Lat Pulldown`
-* เพิ่มปุ่ม `Finish Workout`
-
-#### 5. Workout Logging Integration
-
-* เชื่อมปุ่ม Finish Workout กับ `log_workout()`
-* บันทึกข้อมูลลง SQLite
-* ใช้วันที่ปัจจุบันในการบันทึกข้อมูล
-* แสดงข้อความยืนยันเมื่อบันทึกเสร็จ
-* ตรวจสอบข้อมูลจากฐานข้อมูลหลังบันทึก
-
-### Definition of Done (DoD)
-
-* [X] สามารถเปิด Desktop Application ด้วย PySide6 ได้
-* [X] มีส่วนแสดงข้อมูลท่าออกกำลังกาย
-* [X] มี Workout Programs และส่วนแสดงเซตกับจำนวนครั้ง
-* [X] มีปุ่มสำหรับเปิดรายละเอียดท่าออกกำลังกาย
-* [X] มีปุ่ม Finish Workout
-* [X] เชื่อมปุ่ม Finish Workout เข้ากับฟังก์ชันบันทึกข้อมูล
-* [X] แสดงข้อความยืนยันหลังบันทึก workout
-* [X] ตรวจสอบข้อมูลที่บันทึกจาก SQLite ได้
-* [X] รันทดสอบอัตโนมัติได้ครบตามผลการทดสอบที่บันทึกไว้
-
-### การทดสอบและผลลัพธ์
-
-มีการทดสอบบันทึกข้อมูลจาก GUI และตรวจสอบข้อมูลล่าสุดด้วยคำสั่ง:
-
-```powershell
-python -c "from src.database import get_workout_history; print(get_workout_history()[-1])"
-```
-
-ตัวอย่างข้อมูลที่ตรวจสอบได้:
-
-```python
-('Push Up', '2026-09-30', 3, 10, 0.0)
-('Lat Pulldown', '2026-09-30', 3, 10, 0.0)
-```
-
-มีการรัน automated test ด้วยคำสั่ง:
-
-```powershell
-python -m pytest -q
-```
-
-ผลการทดสอบที่บันทึกไว้:
-
-```text
-13 passed, 14 warnings in 63.30s
-```
-
-การทดสอบดังกล่าวผ่านครบ 13 tests โดยมี warnings ที่เกี่ยวข้องกับการเลิกใช้ Qt application attribute บางรายการใน Matplotlib backend
+### Definition of Done
+- โปรแกรมรันได้ ทุกเมนูเข้าและกลับได้ ใส่ค่าผิดแล้วไม่ crash
+- pytest ผ่านทั้งหมด 9 tests และ Source Code อยู่บน GitHub
 
 ### ผลลัพธ์
-
-* Desktop GUI สำหรับใช้งานแอปพลิเคชัน
-* Exercise Library และรายละเอียดท่าออกกำลังกาย
-* Workout Programs และ Workout Session
-* ระบบบันทึก workout จาก GUI ลง SQLite
-* Automated tests สำหรับตรวจสอบฟังก์ชันสำคัญ
+CLI Prototype ที่เลือกเมนู เลือก Muscle Group และกรอกข้อมูล Workout ได้ (ยังไม่เชื่อม API/ฐานข้อมูล)
 
 ---
 
-## Final Project — Integration and Documentation
+## 5. Sprint 2 — Core Workout Features
 
-**เป้าหมาย:** รวมองค์ประกอบของระบบ ตรวจสอบการทำงานโดยรวม และเตรียมเอกสารประกอบโปรเจกต์
+**เป้าหมาย:** พัฒนาจาก CLI Prototype ให้เป็นโปรแกรมบันทึกและติดตามการออกกำลังกายได้จริง
 
-### ขอบเขตงาน
+### งานที่ทำ
+- [x] เชื่อม ExerciseDB API (`api.py`) พร้อม Map กลุ่มกล้ามเนื้อไปยัง body part และจัดการ Request ไม่สำเร็จ/Timeout
+- [x] สร้าง SQLite Database (`data/fitness.db`) และตาราง `workouts`
+- [x] Workout Logger บันทึกลงฐานข้อมูล (`log_workout()`)
+- [x] Workout History (`get_workout_history()`)
+- [x] Weekly Performance: Workout Count, Exercise Frequency, Total Sets ในช่วง 7 วันล่าสุด (`get_weekly_performance()`)
+- [x] Weekly Chart ด้วย matplotlib (`get_weekly_sets()`, `show_weekly_chart()`)
+- [x] เพิ่ม `data/` ใน `.gitignore` ไม่ให้ commit ฐานข้อมูลจริง
+- [x] Unit Tests รวม 13 รายการ (ผลรัน: 13 passed)
 
-* ตรวจสอบการทำงานร่วมกันระหว่าง GUI, API และฐานข้อมูล
-* ตรวจสอบการบันทึกและเรียกดูประวัติการออกกำลังกาย
-* รัน automated tests
-* จัดทำ README สำหรับอธิบายโปรเจกต์
-* จัดทำ PLAN.md เพื่ออธิบายขอบเขตและพัฒนาการแต่ละ Sprint
-* จัดทำ CHANGELOG.md เพื่อบันทึกการเปลี่ยนแปลงตามเวอร์ชัน
-* จัดเตรียมข้อมูลสำหรับนำเสนอ Final Project
+### Definition of Done
+- Exercise Suggestion ดึงข้อมูลจาก API ได้ / บันทึกและดูประวัติจาก SQLite ได้
+- Weekly Performance และกราฟแสดงผลได้ / pytest ผ่าน 13 tests / Source Code อยู่บน GitHub
 
-### Definition of Done (DoD)
-
-* [X] มีโค้ดสำหรับ Desktop GUI
-* [X] มีโมดูลฐานข้อมูลและระบบบันทึก workout
-* [X] มีชุดทดสอบอัตโนมัติ
-* [X] มีผลการทดสอบที่บันทึกไว้ว่า 13 tests ผ่าน
-* [X] ตรวจสอบ README, PLAN.md และ CHANGELOG.md ให้ตรงกับ Repository ล่าสุด
-
-### สถานะ
-
-ส่วน GUI การบันทึกข้อมูล และ automated tests มีหลักฐานการทดสอบจากการพัฒนาก่อนหน้าแล้ว ส่วนเอกสารและการทดสอบ end-to-end ควรตรวจสอบอีกครั้งก่อนระบุว่าเสร็จสมบูรณ์ทั้งหมด
+### ผลลัพธ์
+โปรแกรม CLI ที่ใช้ฟังก์ชันหลักได้ครบ (Commit สำคัญ: `3a00d94`, `39874e5`)
 
 ---
 
-## สรุปแผนการพัฒนา
+## 6. Sprint 3 — GUI Application & User Experience
 
-| Sprint        | หัวข้อ                  | ผลลัพธ์หลัก                             |
-| ------------- | ----------------------------- | -------------------------------------------------- |
-| Sprint 1      | Front-End App Dev             | CLI และโครงสร้างพื้นฐาน         |
-| Sprint 2      | Back-End App Dev              | Exercise API, SQLite และ Performance Tracking   |
-| Sprint 3      | Desktop GUI Integration       | PySide6 GUI และ Workout Logging                 |
-| Final Project | Integration and Documentation | ตรวจสอบระบบและจัดทำเอกสาร |
+**เป้าหมาย:** พัฒนาเป็น Desktop Application ด้วย PySide6 โดยนำฟีเจอร์จาก Sprint 2 มาเชื่อมกับ GUI
+
+### งานที่ทำ
+- [x] Main Window พร้อม Sidebar Navigation (`QStackedWidget`) และหน้า Home, Workouts, Exercises, Progress, Records, Goals
+- [x] Exercise Library: เลือก Muscle Group, แสดง Exercise Card, หน้า Exercise Detail (Target/Secondary Muscles, Equipment, Instructions, GIF)
+- [x] โหลด GIF ผ่าน Background Thread (`QThread`) และแสดงด้วย `QMovie`
+- [x] Workout Programs (Beginner Full Body, Chest & Triceps, Leg Day) และ Workout Session
+- [x] Records และ Progress เชื่อมกับ SQLite
+- [x] แยกโมดูล `analysis.py` และ `charts.py`
+- [x] ทดสอบ GUI แบบ Manual และ pytest ชุดเดิม 13 tests ผ่าน
+
+### Technical Issues ที่ส่งต่อไป Final Sprint
+- Matplotlib QtAgg ใช้ร่วมกับ PySide6 ไม่ได้ (Import error) จึงฝังกราฟใน GUI ไม่สำเร็จ
+- QThread Lifecycle มี warning "Destroyed while thread is still running"
+- Navigation และ Workout Flow บางส่วนยังปรับปรุง UX ได้
+
+### ผลลัพธ์
+GUI ใช้งาน Exercise Library, Workouts, Records และ Progress ได้ (Commit สำคัญ: `4acfd1e`)
+
+---
+
+## 7. Final Sprint — Stability, Testing, DevOps & Documentation
+
+**เป้าหมาย:** ทำให้ระบบเสถียร ทดสอบครบ ตั้ง CI/CD และจัดทำเอกสารให้พร้อมส่ง
+
+### งานที่ทำเสร็จแล้ว
+- [x] ปรับฐานข้อมูลเป็น `sessions` + `sets` (1 แถว = 1 เซ็ตจริง) พร้อม migration จากตาราง `workouts`
+- [x] Workout Session แก้ไขเซ็ตได้ (เพิ่ม/ลบเซ็ต ปรับ reps/weight)
+- [x] ฝังกราฟ matplotlib ในหน้า Progress สำเร็จ (ล็อกลำดับ import `matplotlib.dates` ก่อน PySide6) และเติม 0 ให้วันที่ไม่มี Workout เพื่อแสดงครบ 7 วัน
+- [x] แก้ QThread Lifecycle ด้วยคลาส `Worker` + `cleanup()` และป้องกันผลจาก API ที่มาช้า (request counter / token)
+- [x] ปรับปรุง API: ดึงทีละ body part แล้วสลับผล (Legs/Arms), จัดการ HTTP 429, `find_exercise_by_name()` สำหรับ Workout Program
+- [x] Personal Records (Stretch) และ CSV Export (Stretch)
+- [x] Refactor: `charts.py` ใช้ร่วมกันทั้ง GUI และ CLI, pure functions ใน `analysis.py`
+- [x] จัดทำ `README.md`, `plan.md`
+
+### งานที่ยังต้องทำ
+- [ ] **TODO – แก้ `tests/test_database.py`** ให้ใช้ `save_session`, `get_history`, `get_personal_records`, `get_weekly_performance` (ตอนนี้เรียกฟังก์ชันและตารางเดิมที่ไม่มีแล้ว)
+- [ ] **TODO – แยกเทสใน `test_main.py` ออกจากฐานข้อมูลจริง** ด้วย `tmp_path` + `monkeypatch`
+- [ ] **TODO – เพิ่มเทสสำหรับ `analysis.py`** (`last_7_days`, `fill_missing_days`, `history_to_rows`, `export_history_csv`)
+- [ ] **TODO – เพิ่ม API Mock Test** สำหรับ `api.py` (mock `requests.get` ไม่เรียก network จริง)
+- [ ] **TODO – ตั้งค่า GitHub Actions** รัน `flake8` + `pytest` อัตโนมัติเมื่อ push / Pull Request และยืนยันสถานะเขียว
+- [ ] **TODO – ตรวจ `requirements.txt`** ให้มี PySide6, matplotlib, requests, pytest, flake8
+- [ ] **TODO – หน้า Home และ Goals** ทำให้เสร็จหรือตัดออก
+- [ ] **TODO – ตรวจ PEP8/lint** ด้วย `flake8`
+- [ ] **TODO – ทดสอบบนเครื่องที่สะอาด** และซ้อมนำเสนอ Live Demo
+
+### Definition of Done
+- `pytest` ผ่านทั้งหมด (รวมเทสใหม่) และ CI ขึ้นเขียวบน GitHub
+- ไม่มีเทสที่เขียนลงฐานข้อมูลจริง
+- README, plan และรายงาน Sprint ตรงกับโปรเจกต์จริง
+- โปรแกรมรันได้บนเครื่องที่ติดตั้งจาก `requirements.txt`
+
+รายงานผลของ Sprint นี้อยู่ที่ [`final sprint.md`](final%20sprint.md)
+
+---
+
+## 8. สถานะ Stretch Features (จาก Project Pitch)
+
+| Feature | สถานะ |
+|---------|-------|
+| CSV Export | ทำแล้ว |
+| Personal Best | ทำแล้ว (หน้า Records) |
+| Favorite Exercise | ยังไม่ได้ทำ |
+| Monthly Statistics | ยังไม่ได้ทำ |
+| AI-Assisted Recommendation | ยังไม่ได้ทำ — **TODO ตัดสินใจว่าจะทำหรือไม่ และระบุเหตุผล** |
+
+## 9. Evaluation Checklist (ติดตามจาก Project Pitch)
+
+| Requirement | สถานะ |
+|-------------|-------|
+| Python Application | ทำแล้ว |
+| Public API Integration / `requests` / JSON Parsing | ทำแล้ว (ExerciseDB) |
+| SQLite Persistence | ทำแล้ว |
+| Functional Style / Modular Functions / Separation of Concerns | ทำแล้ว |
+| Exception Handling | ทำแล้ว (API timeout, 429, JSON error, OSError ตอน export) |
+| Data Visualization | ทำแล้ว (matplotlib, ฝังใน GUI) |
+| Unit Testing (`pytest`) | มีแล้ว แต่ต้องอัปเดตให้ตรง schema ใหม่ |
+| Database Testing | ต้องเขียนใหม่ (TODO) |
+| API Mock Testing | ยังไม่มี (TODO) |
+| GitHub | ใช้งานแล้ว |
+| CI/CD (GitHub Actions) | TODO |
+| Code Quality (PEP8 / linting) | TODO |
+| CSV Export | ทำแล้ว (Stretch) |
+| AI Feature | ยังไม่ได้ทำ (Stretch) |
+
+## 10. ความเสี่ยงและแนวทางรับมือ
+
+| ความเสี่ยง | แนวทางรับมือ |
+|-----------|--------------|
+| ExerciseDB API ช้า ล่ม หรือจำกัดจำนวนคำขอ | Timeout, ข้อความแจ้งผู้ใช้, โหลดใน Background Thread, แคช GIF |
+| เทสเขียนลงฐานข้อมูลจริงหรือล้าสมัยหลังเปลี่ยน schema | ใช้ฐานข้อมูลชั่วคราวในทุกเทส และให้ CI รันเทสทุกครั้งที่ push |
+| ข้อมูลจากโครงสร้างฐานข้อมูลเดิม | Migration อัตโนมัติ เปลี่ยนชื่อตารางเก่าเป็น `workouts_legacy` ไม่ลบข้อมูล |
+| Import order ของ matplotlib/PySide6 | ล็อก `import matplotlib.dates` เป็นบรรทัดแรกของ `app.py` |
+| เครือข่ายตรวจ SSL ไม่ผ่าน | ใช้สวิตช์ `VERIFY_SSL` ใน `api.py` |

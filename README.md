@@ -1,192 +1,173 @@
-Project Pitch: Mini Fitness Coach
-1. Project Title
-Mini Fitness Coach
+# Mini Fitness Coach
 
-โปรแกรมผู้ช่วยออกกำลังกายขนาดเล็กสำหรับช่วยค้นหาท่าออกกำลังกาย บันทึกการออกกำลังกาย และดูสถิติการออกกำลังกายของผู้ใช้
+โปรแกรมผู้ช่วยออกกำลังกายขนาดเล็กที่เขียนด้วย Python ช่วยให้ผู้ใช้ค้นหาท่าออกกำลังกายตามกลุ่มกล้ามเนื้อ บันทึกการออกกำลังกายทีละเซ็ต และดูสถิติ สถิติส่วนตัวสูงสุด (Personal Records) และกราฟการออกกำลังกายย้อนหลังได้
 
-2. Problem Statement
-ปัจจุบันนักศึกษาหรือผู้ที่เริ่มต้นออกกำลังกายอาจไม่รู้ว่าควรเลือกท่าออกกำลังกายแบบไหนให้เหมาะกับส่วนของร่างกายที่ต้องการฝึก และเมื่อออกกำลังกายเป็นประจำก็อาจไม่มีวิธีที่ง่ายในการบันทึกว่าแต่ละวันออกกำลังกายอะไรไปบ้าง
+โปรเจกต์นี้มี 2 หน้าจอที่ใช้ฐานข้อมูลและตรรกะชุดเดียวกัน:
 
-ดังนั้นจึงต้องการสร้างโปรแกรมที่ช่วยรวบรวมข้อมูลท่าออกกำลังกายและบันทึกประวัติการออกกำลังกายไว้ในระบบ เพื่อให้ผู้ใช้สามารถค้นหาท่าออกกำลังกายและติดตามการออกกำลังกายของตัวเองได้ง่ายขึ้น
+- **Desktop GUI** (PySide6) — `src/app.py`
+- **Command-line menu (CLI)** — `src/main.py`
 
-3. Proposed Solution
-พัฒนาโปรแกรม Mini Fitness Coach ด้วยภาษา Python โดยเชื่อมต่อกับ Exercise API เพื่อดึงข้อมูลท่าออกกำลังกายมาแสดงให้ผู้ใช้ค้นหา
+> พัฒนาเป็น 4 Sprint: CLI Prototype → Core Workout Features → GUI Application → Final Sprint (รายละเอียดดูที่ [`plan.md`](plan.md))
 
-ผู้ใช้สามารถค้นหาท่าออกกำลังกายตามส่วนของร่างกายหรือกล้ามเนื้อที่ต้องการฝึก จากนั้นสามารถบันทึก Workout ของตัวเองลงในฐานข้อมูล SQLite และดูประวัติหรือสถิติการออกกำลังกายย้อนหลังได้
+## ปัญหาที่โปรเจกต์ต้องการแก้
 
-ระบบจะออกแบบเป็นโปรแกรมแบบ Modular และ Functional Programming Style โดยแบ่งการทำงานออกเป็นฟังก์ชันที่มีหน้าที่ชัดเจน เช่น การดึงข้อมูลจาก API การบันทึก Workout และการวิเคราะห์ข้อมูล เพื่อให้โค้ดเป็นระเบียบและสามารถพัฒนาต่อได้ง่าย
+นักศึกษาและผู้เริ่มต้นออกกำลังกายมักไม่รู้ว่าควรเลือกท่าไหนให้เหมาะกับกล้ามเนื้อที่ต้องการฝึก และไม่มีวิธีที่ง่ายในการจดว่าแต่ละวันทำอะไรไปบ้าง Mini Fitness Coach รวมทั้งสองอย่างไว้ในโปรแกรมเดียว
 
-4. Domain
-Health / Fitness Application
+## ฟีเจอร์
 
-โปรเจกต์อยู่ในด้าน Health และ Fitness โดยเน้นการช่วยจัดการข้อมูลการออกกำลังกายส่วนบุคคล
+- **Exercise Library** — เลือกกลุ่มกล้ามเนื้อ (Chest, Back, Legs, Shoulders, Arms, Abs) แล้วดูท่าออกกำลังกายพร้อม GIF, Target Muscle, Equipment และ Instructions จาก [ExerciseDB API](https://exercisedb.dev/)
+- **Workout Programs** — เริ่มโปรแกรมสำเร็จรูป (Beginner Full Body, Chest & Triceps, Leg Day) หรือเริ่มจากท่าเดียวได้
+- **Workout Session / Logger** — บันทึก reps และ weight ของแต่ละเซ็ต เพิ่ม/ลบเซ็ตได้ระหว่างออกกำลังกาย
+- **Weekly Progress** — จำนวนครั้งที่ออกกำลังกาย จำนวนท่าที่ต่างกัน และจำนวนเซ็ตรวมใน 7 วันล่าสุด พร้อมกราฟแท่ง (matplotlib) แสดงครบ 7 วัน
+- **Personal Records & History** — น้ำหนักสูงสุดและ reps สูงสุดของแต่ละท่า พร้อมประวัติการออกกำลังกายทั้งหมด
+- **CSV Export** — ส่งออกประวัติทั้งหมด (1 แถวต่อ 1 เซ็ต) เปิดใน Excel ได้
+- **Migration ข้อมูลเก่า** — ย้ายข้อมูลจากตาราง `workouts` แบบเดิมเข้าโครงสร้างใหม่อัตโนมัติ
 
-5. API
-API Name: ExerciseDB API (V1 Free API)
-Documentation Link: https://exercisedb.dev/
-Type of Data: Exercise Data เช่น Exercise Name, Body Part, Target Muscle, Equipment, Instructions และ GIF/Image
-ใช้ ExerciseDB API สำหรับดึงข้อมูลท่าออกกำลังกายมาใช้ในระบบ เช่น การค้นหาและแนะนำท่าออกกำลังกายตาม Muscle Group โดยข้อมูลที่ได้รับจาก API อยู่ในรูปแบบ JSON และเรียกใช้งานผ่าน HTTP GET Request ด้วย Python requests
+## Tech Stack
 
-ระบบจะมีการจัดการกรณี API ไม่สามารถเชื่อมต่อได้ หรือได้รับข้อมูลที่ไม่ถูกต้องด้วย Exception Handling
+| ส่วน | เทคโนโลยี |
+|------|-----------|
+| ภาษา | Python 3 |
+| GUI | PySide6 (Qt) |
+| กราฟ | matplotlib |
+| ฐานข้อมูล | SQLite (`sqlite3`) |
+| เรียก API | requests |
+| ทดสอบ | pytest |
+| CI/CD | GitHub Actions (**TODO – ยืนยันว่าตั้งค่าแล้ว**) |
 
-6. Persistence Plan
-ใช้ SQLite เป็นฐานข้อมูลหลักของโปรแกรม
+## สถาปัตยกรรม
 
-ข้อมูลที่จัดเก็บ เช่น
+โปรเจกต์ใช้ Functional Programming Style ร่วมกับ Modular Architecture และแยกการทำงานเป็น 3 ชั้น
 
-Exercise
-
-Exercise ID
-Exercise Name
-Body Part
-Target Muscle
-Equipment
-Workout
-
-Workout ID
-Exercise Name
-Date
-Sets
-Repetitions
-Weight
-SQLite เหมาะกับโปรเจกต์นี้เพราะสามารถเก็บข้อมูลไว้ในเครื่องและไม่จำเป็นต้องใช้ Database Server ภายนอก
-
-นอกจากนี้สามารถเพิ่มฟังก์ชัน CSV Export เป็น Stretch Feature เพื่อให้ผู้ใช้ส่งออกประวัติ Workout ได้
-
-7. Framework / Programming Style
-ใช้ Functional Programming Style ร่วมกับ Modular Architecture
-
-แบ่งการทำงานออกเป็นฟังก์ชันที่มีหน้าที่ชัดเจน เช่น:
-
-fetch_exercises()
-suggest_exercises()
-log_workout()
-get_workout_history()
-analyze_weekly_performance()
-show_weekly_chart()
-แบ่งโค้ดออกเป็น Module เช่น:
-
-api.py → ดึงข้อมูลจาก ExerciseDB API
-database.py → จัดการ SQLite และ Workout Logs
-analysis.py → วิเคราะห์ข้อมูลรายสัปดาห์
-main.py → จัดการ Menu และ Program Flow
-Project Architecture
+```text
 Mini Fitness Coach
 │
 ├── Presentation Layer
-│   └── CLI / Menu
+│   ├── GUI  (app.py)
+│   └── CLI  (main.py)
 │
 ├── Business Logic Layer
-│   ├── Exercise Suggestion
-│   ├── Workout Logger
-│   └── Weekly Statistics
+│   ├── Exercise Suggestion   (api.py)
+│   ├── Workout Logger        (database.py)
+│   └── Weekly Statistics     (analysis.py, charts.py)
 │
 └── Data Access Layer
-    ├── Exercise API
-    └── SQLite Database
-8. Roles
-แบ่งหน้าที่ของสมาชิกตามบทบาทดังนี้
+    ├── ExerciseDB API        (api.py)
+    └── SQLite Database       (database.py)
+```
 
-Project Manager / CI-CD Integrator — นายนันทกร โนนกลาง
+## โครงสร้างโปรเจกต์
 
-วางแผน Sprint และลำดับการพัฒนา
-ออกแบบ Program Flow และ Menu
-วางแผนโครงสร้าง SQLite Database
-จัดทำและดูแลเอกสาร
-ติดตามความคืบหน้าของทีม
-จัดการ GitHub Repository และ CI/CD
-Automated Tester & QA — นายณัฐกิตติ์ กุลวงศ์
+```text
+mini-fitness-coach/
+├── src/
+│   ├── app.py        # PySide6 desktop GUI
+│   ├── main.py       # Command-line interface
+│   ├── api.py        # ExerciseDB API client
+│   ├── database.py   # SQLite schema, อ่าน/เขียนข้อมูล, migration
+│   ├── analysis.py   # สถิติรายสัปดาห์ และ CSV export
+│   └── charts.py     # กราฟรายสัปดาห์ (ใช้ร่วมกันทั้ง GUI และ CLI)
+├── tests/
+│   ├── test_database.py
+│   └── test_main.py
+├── data/
+│   └── fitness.db    # สร้างอัตโนมัติ (อยู่ใน .gitignore)
+├── PLAN.md / plan.md
+├── README.md
+├── requirements.txt
+└── .gitignore
+```
 
-เขียนและรัน Unit Tests ด้วย pytest
-ทดสอบ API และ Exception Handling
-ทดสอบ SQLite Database
-ตรวจสอบ Edge Cases และ Invalid Inputs
-ค้นหาและแก้ไข Bugs
-Core Developer — นายวรากร โสภา
+## การติดตั้ง
 
-พัฒนาและเชื่อมต่อ ExerciseDB API
-พัฒนา Exercise Suggestion
-พัฒนา Workout Logger
-พัฒนา Weekly Performance และ Simple Chart
-เชื่อมต่อส่วนต่าง ๆ ของระบบ
-9. MVP Features
-MVP 1 — Exercise Suggestion by Muscle Group
-ผู้ใช้สามารถเลือก Muscle Group ที่ต้องการฝึก และระบบจะแนะนำท่าออกกำลังกายที่เกี่ยวข้องจาก ExerciseDB API
+1. Clone repository แล้วเข้าโฟลเดอร์โปรเจกต์
 
-ตัวอย่าง:
+   ```bash
+   git clone https://github.com/nattakitkul/mini-fitness-coach.git
+   cd mini-fitness-coach
+   ```
 
-Select Muscle Group:
+2. (แนะนำ) สร้าง virtual environment
 
-1. Chest
-2. Back
-3. Legs
-4. Shoulders
-5. Arms
-6. Abs
-MVP 2 — Workout Logger
-ผู้ใช้สามารถบันทึก Workout ที่ทำในแต่ละวันได้
+   ```bash
+   python -m venv venv
+   source venv/bin/activate        # Windows: venv\Scripts\activate
+   ```
 
-ตัวอย่างข้อมูล:
+3. ติดตั้ง dependencies
 
-Exercise : Squat
-Date     : 15/09/2026
-Sets     : 3
-Reps     : 10
-Weight   : 40 kg
-ข้อมูลจะถูกบันทึกลง SQLite และสามารถเรียกดูย้อนหลังได้
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-MVP 3 — Weekly Performance + Simple Chart
-แสดงสถิติการออกกำลังกายของผู้ใช้ในแต่ละสัปดาห์ เช่น จำนวนครั้งที่ออกกำลังกาย จำนวน Workout และจำนวน Sets พร้อมแสดงผลในรูปแบบกราฟอย่างง่ายด้วย matplotlib
+   ถ้า `requirements.txt` ยังไม่ครบ ให้ติดตั้งเองด้วย:
 
-Example:
+   ```bash
+   pip install PySide6 matplotlib requests pytest
+   ```
 
-Day	Workout	Sets
-Monday	Chest	4
-Wednesday	Back	3
-Friday	Legs	5
-Sunday	Chest	4
-จากข้อมูลตัวอย่าง ระบบจะสรุปว่าในสัปดาห์นั้นผู้ใช้ออกกำลังกาย 4 ครั้ง และทำทั้งหมด 16 Sets พร้อมแสดงกราฟจำนวน Sets ที่ทำในแต่ละวันด้วย matplotlib
+ต้องใช้อินเทอร์เน็ตสำหรับ Exercise Library (ข้อมูลและ GIF จาก API) ส่วนการบันทึกและดูประวัติ Workout ใช้งานแบบออฟไลน์ได้
 
-10. Stretch Features
-หลังจาก MVP เสร็จแล้ว อาจเพิ่มความสามารถดังต่อไปนี้
+## วิธีใช้งาน
 
-⭐ Favorite Exercise
-ให้ผู้ใช้สามารถบันทึกท่าออกกำลังกายที่ชื่นชอบไว้ เพื่อให้สามารถเรียกดูและเลือกใช้งานได้ง่ายในภายหลัง
+รันจาก root ของโปรเจกต์เสมอ เพราะโค้ด import จากแพ็กเกจ `src`
 
-⭐ CSV Export
-ให้ผู้ใช้สามารถส่งออกประวัติ Workout จาก SQLite Database เป็นไฟล์ CSV เพื่อนำข้อมูลไปใช้งานหรือวิเคราะห์เพิ่มเติมได้
+**Desktop GUI**
 
-⭐ Personal Best
-บันทึกและแสดงสถิติที่ดีที่สุดของผู้ใช้ เช่น น้ำหนักสูงสุดที่เคยยกได้ในแต่ละท่าออกกำลังกาย
+```bash
+python -m src.app
+```
 
-⭐ Monthly Statistics
-เพิ่มการวิเคราะห์สถิติในระดับเดือน เช่น จำนวนวันที่ออกกำลังกาย จำนวน Workout และจำนวน Sets ในแต่ละเดือน
+หน้าหลักใน Sidebar: Home, Workouts, Exercises, Progress, Records, Goals
 
-⭐ AI-Assisted Recommendation
-เพิ่มระบบ AI เพื่อช่วยวิเคราะห์ประวัติการออกกำลังกายของผู้ใช้ และแนะนำ Workout ที่เหมาะสมกับรูปแบบการออกกำลังกายของผู้ใช้
+**Command-line menu**
 
-11. Evaluation Checklist
-Requirement	Plan
-Python Application	✅
-Public API Integration	✅ Exercise API
-requests	✅
-JSON Parsing	✅
-SQLite Persistence	✅
-Functional Programming Style	✅
-Modular Functions	✅
-Modular Architecture	✅
-Separation of Concerns	✅
-Exception Handling	✅
-Unit Testing	✅ pytest
-API Mock Testing	✅
-Database Testing	✅
-GitHub	✅
-CI/CD	✅ GitHub Actions
-Code Quality	✅ PEP8 / linting
-CSV Export	⭐ Stretch
-Data Visualization	✅ MVP 3
-AI Feature	⭐ Stretch
-12. Expected Outcome
-เมื่อพัฒนาเสร็จ โปรแกรม Mini Fitness Coach สามารถแนะนำท่าออกกำลังกายตามกลุ่มกล้ามเนื้อจาก ExerciseDB API บันทึก Workout ลงใน SQLite และวิเคราะห์ Performance รายสัปดาห์พร้อมแสดง Simple Chart ได้
+```bash
+python -m src.main
+```
 
-โปรเจกต์จะมีโครงสร้างแบบ Functional และ Modular พร้อม Unit Tests และ CI/CD เพื่อช่วยตรวจสอบคุณภาพของโค้ด
+เมนู: Exercise Suggestion, Workout Logger, Workout History, Weekly Performance, Exit
+
+## ฐานข้อมูล
+
+ไฟล์ SQLite อยู่ที่ `data/fitness.db` และถูกสร้างอัตโนมัติเมื่อเปิดโปรแกรม
+
+| ตาราง | ความหมาย |
+|-------|----------|
+| `sessions` | 1 แถว = 1 ครั้งที่ไปออกกำลังกาย (`id`, `name`, `date`) |
+| `sets` | 1 แถว = 1 เซ็ตจริง (`session_id`, `exercise_name`, `set_number`, `reps`, `weight`) |
+
+เมื่อลบ session เซ็ตที่เกี่ยวข้องจะถูกลบตาม (`ON DELETE CASCADE`) ตาราง `workouts` แบบเดิมจะถูกเปลี่ยนชื่อเป็น `workouts_legacy` หลัง migration (ไม่ลบข้อมูล)
+
+## การทดสอบ
+
+```bash
+pytest
+```
+
+> **สถานะ:** **TODO – กรอกผลรัน pytest ล่าสุด** (หมายเหตุ: `tests/test_database.py` ต้องอัปเดตให้ตรงกับโครงสร้าง `sessions`/`sets` ใหม่)
+
+## ข้อควรรู้
+
+- `src/api.py` ตั้ง `VERIFY_SSL = False` ตามโปรแกรมเดิม ถ้าเครือข่ายรองรับให้เปลี่ยนเป็น `True`
+- ใน `src/app.py` ต้องให้ `import matplotlib.dates` เป็นบรรทัด import แรกเสมอ ไม่เช่นนั้นถ้า import PySide6 ก่อนจะเกิด `AttributeError` จาก dateutil/six
+- หน้า **Home** และ **Goals** ใน GUI ยังเป็นหน้าว่างสำหรับพัฒนาต่อ
+- ไฟล์ฐานข้อมูลจริงไม่ถูก commit ขึ้น Git
+
+## ทีมพัฒนา
+
+| ชื่อ | บทบาท | หน้าที่หลัก |
+|------|-------|-------------|
+| นายนันทกร โนนกลาง | Project Manager / CI-CD Integrator | วางแผน Sprint, ออกแบบ Program Flow และ Database, ดูแลเอกสาร, GitHub และ CI/CD |
+| นายณัฐกิตติ์ กุลวงศ์ | Automated Tester & QA | เขียนและรัน Unit Tests, ทดสอบ API/Database/Edge Cases, หาและแก้ Bugs |
+| นายวรากร โสภา | Core Developer | พัฒนา API, Exercise Suggestion, Workout Logger, Weekly Performance และเชื่อมต่อระบบ |
+
+## เอกสารประกอบ
+
+- [`Project Pitch.md`](Project%20Pitch.md) — ข้อเสนอโปรเจกต์
+- [`plan.md`](plan.md) — แผนการพัฒนาทั้ง 4 Sprint
+- `sprint1.md`, `sprint2.md`, `sprint3.md`, `final sprint.md` — รายงานผลแต่ละ Sprint
+
+## Repository
+
+https://github.com/nattakitkul/mini-fitness-coach
