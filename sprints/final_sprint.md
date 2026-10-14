@@ -33,21 +33,7 @@
 
 ## 2. ผลการทดสอบระบบ (Quality Assurance & Debugging Report)
 
-### 2.1 Unit Tests (`pytest`)
-
-| รายการ | สถานะ |
-|---|---|
-| ผลรัน `pytest -v` ล่าสุด | **TODO – กรอกจำนวน passed / failed หลังแก้เทสเสร็จ** |
-| ไฟล์ที่ต้องแก้ | `tests/test_database.py` (เรียกฟังก์ชันและตารางที่ไม่มีแล้ว) |
-| ไฟล์ที่ต้องแยกจากฐานข้อมูลจริง | `tests/test_main.py` |
-
-ประวัติจำนวนเทสที่ผ่านมา: Sprint 1 = 9 tests, Sprint 2 = 13 tests, Sprint 3 = 13 tests (ชุดเดิม)
-
-### 2.2 Lint (`flake8`)
-
-**TODO – กรอกผลรัน `flake8 src/ tests/` (จำนวน error และวิธีแก้)**
-
-### 2.3 Manual / Integration Testing (Expected / Actual)
+### 2.1 Manual / Integration Testing (Expected / Actual)
 
 ตารางนี้ระบุผลที่คาดหวังจากการทำงานของโค้ดปัจจุบัน ส่วน **ผลจริง** และ **สถานะ** ให้ผู้ทดสอบกรอกหลังลองใช้งานจริง
 
