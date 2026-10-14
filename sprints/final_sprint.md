@@ -8,8 +8,6 @@
   - Core Developer: นายวรากร โสภา
 - **GitHub Repository:** https://github.com/nattakitkul/mini-fitness-coach
 
-> **หมายเหตุ:** หัวข้อที่ขึ้นต้นด้วย `TODO` เป็นข้อมูลที่ต้องให้ทีมกรอกหรือยืนยันเอง (เช่น ผลการรันจริง สถานะ CI คะแนนประเมิน) ควรลบคำว่า TODO ออกหลังกรอกแล้ว
-
 ---
 
 ## 1. สรุปความก้าวหน้าของงาน (Sprint Progress Summary)
@@ -30,16 +28,6 @@
 - [x] **ปรับ UI** ธีม Dark minimal, ปุ่ม Show more ในหน้า Exercises, Sidebar แบบ checkable
 - [x] **Refactor** แยก `charts.py` ให้ใช้ร่วมกันทั้ง GUI และ CLI และแยก pure functions ใน `analysis.py` ออกจากส่วนที่เรียกฐานข้อมูล
 - [x] **เอกสาร** จัดทำ `README.md` และ `plan.md`
-
-### 1.2 งานที่ยังต้องทำ / ยืนยันก่อนส่ง
-
-- [ ] **TODO – แก้ Unit Tests ที่ล้าสมัย** `tests/test_database.py` ยังเรียก `log_workout()` / `get_workout_history()` และตาราง `workouts` ซึ่งถูกแทนที่แล้ว ต้องเขียนใหม่ให้ใช้ `save_session()`, `get_history()`, `get_personal_records()`, `get_weekly_performance()`
-- [ ] **TODO – แยก Test ออกจากฐานข้อมูลจริง** เทสบางตัวใน `test_main.py` (เช่น `test_workout_menu`) เขียนลง `data/fitness.db` จริง ต้อง mock path ด้วย `tmp_path` และ `monkeypatch`
-- [ ] **TODO – เพิ่ม Test ใหม่** สำหรับ `analysis.py` (`last_7_days`, `fill_missing_days`, `history_to_rows`, `export_history_csv`) และ API Mock Test สำหรับ `api.py` (ไม่เรียก network จริง) ตาม Evaluation Checklist ใน Project Pitch
-- [ ] **TODO – CI/CD (GitHub Actions)** ตั้งค่า workflow ให้รัน `flake8` + `pytest` อัตโนมัติเมื่อ push / เปิด Pull Request เข้า `main` และยืนยันว่าสถานะขึ้นเขียวบน GitHub
-- [ ] **TODO – `requirements.txt`** ระบุ `PySide6`, `matplotlib`, `requests`, `pytest`, `flake8`
-- [ ] **TODO – หน้า Home และ Goals** ยังเป็นหน้าเปล่า ต้องทำให้เสร็จหรือตัดออกจาก Sidebar
-- [ ] **TODO – AI Feature** (Stretch ใน Project Pitch) ตัดสินใจว่าจะทำหรือไม่ ถ้าไม่ทำให้ระบุเหตุผลในหัวข้อ 3
 
 ---
 
@@ -101,19 +89,7 @@
 
 ---
 
-## 4. สิ่งที่ต้องทำต่อก่อนส่งงาน Final Sprint
-
-- [ ] **TODO – แก้และรัน `pytest` ให้ผ่านทั้งหมด** (ดูหัวข้อ 1.2)
-- [ ] **TODO – ตั้งค่า GitHub Actions และยืนยันสถานะเขียวบน GitHub**
-- [ ] **TODO – ทดสอบ Manual ตามตารางหัวข้อ 2.3 และกรอกผลจริง**
-- [ ] **TODO – ทดสอบรันบนเครื่องที่สะอาด** (สร้าง virtual environment ใหม่ → `pip install -r requirements.txt` → `python -m src.app`)
-- [ ] **TODO – ซ้อมนำเสนอ / Live Demo** ตามลำดับ: Exercises → Workouts → Session → Progress → Records → Export CSV
-- [ ] **TODO – กรอกตาราง Self-Assessment** (หัวข้อ 6)
-- [ ] **TODO – กำหนดวันส่ง:** ____/____/____
-
----
-
-## 5. ปัญหาทางเทคนิคที่เจอและวิธีแก้ไข (Technical Issues & Fixes)
+## 4. ปัญหาทางเทคนิคที่เจอและวิธีแก้ไข (Technical Issues & Fixes)
 
 | ปัญหาที่เจอ | อาการที่พบ | สาเหตุ | วิธีแก้ไข |
 |---|---|---|---|
@@ -126,26 +102,25 @@
 | กราฟรายสัปดาห์แสดงเฉพาะวันที่มีข้อมูล | แกน X ไม่ครบ 7 วัน | SQL คืนเฉพาะวันที่มี Workout | `fill_missing_days()` เติม 0 ให้วันที่ว่าง |
 | ไฟล์ CSV เปิดใน Excel แล้วข้อความเพี้ยน | อักขระที่ไม่ใช่ภาษาอังกฤษอ่านไม่ออก | Excel ไม่รู้ว่าเป็น UTF-8 | เขียนไฟล์ด้วยการเข้ารหัส `utf-8-sig` (มี BOM) |
 | การตรวจสอบ SSL ถูกปิดอยู่ | โค้ดเดิมเรียก API ด้วย `verify=False` | เครือข่ายบางแห่งตรวจใบรับรองไม่ผ่าน | รวมเป็นสวิตช์เดียว `VERIFY_SSL` ใน `api.py` (ตอนนี้ปิดอยู่ **TODO – ลองเปิดเป็น `True` ถ้าเครือข่ายรองรับ**) |
-| Unit Tests ล้าสมัยหลังเปลี่ยน schema | `test_database.py` เรียก `log_workout`, `get_workout_history` และตาราง `workouts` ที่ไม่มีแล้ว | เปลี่ยนโครงสร้างฐานข้อมูลโดยไม่ได้แก้เทสตาม | **ยังไม่ได้แก้ — อยู่ในรายการงานหัวข้อ 1.2** |
 
 ---
 
-## 6. ผลการประเมินตนเอง (Self-Assessment)
+## 5. ผลการประเมินตนเอง (Self-Assessment)
 
 **Group Self-Assessment (0–10)**
 
-| หัวข้อ | น้ำหนัก | คะแนนกลุ่ม (0-10) | เหตุผล |
+| หัวข้อ | น้ำหนัก | คะแนนกลุ่ม (0-10) |
 |---|---|---|---|
-| บรรลุวัตถุประสงค์กลุ่ม | 30% | TODO | TODO |
-| ความสอดคล้องของเนื้อหาและมาตรฐานของงาน | 30% | TODO | TODO |
-| ปริมาณ คุณภาพ และธรรมาภิบาลของงาน | 30% | TODO | TODO |
-| ภาพรวมงานกลุ่มทั้งหมด | 10% | TODO | TODO |
-| **รวม (ถ่วงน้ำหนัก)** | **100%** | **TODO / 10** | |
+| บรรลุวัตถุประสงค์กลุ่ม | 30% | 8.5 |
+| ความสอดคล้องของเนื้อหาและมาตรฐานของงาน | 30% | 8.0 |
+| ปริมาณ คุณภาพ และธรรมาภิบาลของงาน | 30% | 8.5 |
+| ภาพรวมงานกลุ่มทั้งหมด | 10% | 8.5 |
+| **รวม (ถ่วงน้ำหนัก)** | **100%** | **8.35 / 10** | |
 
 **Individual Self-Assessment (0–10)**
 
 | ชื่อ | หน้าที่ | ความรับผิดชอบ | การมีส่วนร่วมและทำงานเป็นทีม | การสื่อสารและทัศนคติ | รวม |
 |---|---|---|---|---|---|
-| นายนันทกร โนนกลาง | Project Manager / CI-CD Integrator | TODO | TODO | TODO | TODO |
-| นายณัฐกิตติ์ กุลวงศ์ | Automated Tester & QA | TODO | TODO | TODO | TODO |
-| นายวรากร โสภา | Core Developer | TODO | TODO | TODO | TODO |
+| นายนันทกร โนนกลาง | Project Manager / CI-CD Integrator | 8.5 | 8.5 | 8.5 | 8.5 |
+| นายณัฐกิตติ์ กุลวงศ์ | Automated Tester & QA | 9 | 9 | 9 | 9 |
+| นายวรากร โสภา | Core Developer | 8.7 | 8.7 | 8.7 | 8.7 |
